@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🇮🇸 Island 2026</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 </head>
 <body>
 
@@ -59,6 +61,26 @@
       <div><span style="color:var(--muted)">Code:</span> <span style="font-family:monospace;color:var(--ice);letter-spacing:.1rem">4PC L5H T9L</span></div>
       <div><span style="color:var(--muted)">Gruppe:</span> <span style="color:var(--ice)">Island 2026 Sommer</span></div>
     </div>
+  </div>
+
+  <!-- Trip map (collapsed) -->
+  <details id="trip-map-details" class="card" style="padding:.85rem 1rem;margin-bottom:1.2rem">
+    <summary style="cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;font-weight:600">
+      <span>🗺 Reisekarte · 5 Stopps</span>
+      <span style="font-size:.75rem;color:var(--muted)" id="map-toggle-lbl">▼ Öffnen</span>
+    </summary>
+    <div id="trip-map" style="height:340px;border-radius:8px;margin-top:.85rem;background:rgba(255,255,255,.04)"></div>
+    <div style="font-size:.7rem;color:var(--muted);text-align:right;margin-top:.4rem">© OpenStreetMap</div>
+  </details>
+
+  <!-- Iceland fact rotator -->
+  <div class="card" id="fact-card" style="padding:1.1rem 1.2rem;margin-bottom:1.2rem;background:linear-gradient(135deg,rgba(74,143,168,.08),rgba(58,122,148,.05));border-color:rgba(74,143,168,.25)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem">
+      <span style="font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)" id="fact-cat">🧙 Wussten Sie schon?</span>
+      <button id="fact-next" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:99px;font-size:.7rem;padding:.2rem .65rem;cursor:pointer">↻ Nächste</button>
+    </div>
+    <div id="fact-text" style="font-size:.92rem;line-height:1.55;margin-bottom:.55rem">…</div>
+    <a id="fact-link" href="#" target="_blank" rel="noopener" style="font-size:.74rem;color:var(--ice);text-decoration:none">→ Mehr erfahren</a>
   </div>
 
   <!-- Phases -->
@@ -217,6 +239,69 @@ loadWeather();
 // Road status
 document.getElementById('road-card').innerHTML = roadCardHTML('compact');
 tryLiveRoadStatus();
+
+// ── Trip map (Leaflet, init on first expand) ────────────────────────────────
+const TRIP_STOPS = [
+  { id:'vest', name:'Vestmannaeyjar',   lat:63.4427, lon:-20.2734, color:'#4a8fa8' },
+  { id:'laug', name:'Laugarás',         lat:64.1450, lon:-20.4900, color:'#5ada8a' },
+  { id:'sued', name:'Südküste · Höfn',  lat:64.4007, lon:-14.9590, color:'#f0c060' },
+  { id:'haug', name:'Hauganes',         lat:65.9300, lon:-18.1800, color:'#c8a2e8' },
+  { id:'reyk', name:'Reykjavík',        lat:64.1466, lon:-21.9426, color:'#7ad2e8' },
+];
+let mapInited = false;
+function initTripMap() {
+  if (mapInited || !window.L) return;
+  mapInited = true;
+  const map = L.map('trip-map', { scrollWheelZoom:false, attributionControl:false }).setView([65.0, -18.5], 5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:12 }).addTo(map);
+  const pts = [];
+  TRIP_STOPS.forEach((s, i) => {
+    pts.push([s.lat, s.lon]);
+    const ph = TRIP.phases.find(p => p.id === s.id) || {};
+    const icon = L.divIcon({
+      className:'trip-marker',
+      html:`<div style="background:${s.color};color:#0f1923;border:2.5px solid #fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;box-shadow:0 2px 8px rgba(0,0,0,.5)">${i+1}</div>`,
+      iconSize:[30,30], iconAnchor:[15,15]
+    });
+    L.marker([s.lat, s.lon], { icon }).addTo(map)
+      .bindPopup(`<b>${i+1}. ${s.name}</b><br><span style="font-size:.8rem">${ph.dates || ''}</span>`);
+  });
+  L.polyline(pts, { color:'#4a8fa8', weight:2.5, dashArray:'6,8', opacity:.75 }).addTo(map);
+  map.fitBounds(pts, { padding:[28,28] });
+}
+document.getElementById('trip-map-details').addEventListener('toggle', function() {
+  document.getElementById('map-toggle-lbl').textContent = this.open ? '▲ Schliessen' : '▼ Öffnen';
+  if (this.open) setTimeout(initTripMap, 80);
+});
+
+// ── Iceland fact rotator ────────────────────────────────────────────────────
+const FACTS = [
+  { cat:'🧙 Folklore',  text:'Über die Hälfte der Isländer schliesst die Existenz der Huldufólk (verborgenes Volk) nicht aus. Strassen werden teilweise umgeleitet, um deren «Wohnsteine» nicht zu zerstören.', url:'https://de.wikipedia.org/wiki/Huldufólk' },
+  { cat:'📚 Literatur', text:'Halldór Laxness erhielt 1955 den Literaturnobelpreis. Sein Roman «Sein eigener Herr» gilt als Schlüsselwerk der modernen isländischen Literatur.', url:'https://de.wikipedia.org/wiki/Halldór_Laxness' },
+  { cat:'🎵 Musik',     text:'Björk wurde 1965 in Reykjavík geboren. Sie war Sängerin der Sugarcubes, bevor sie 1993 mit «Debut» ihre Solokarriere startete.', url:'https://de.wikipedia.org/wiki/Björk' },
+  { cat:'🎵 Musik',     text:'Sigur Rós singen oft in «Vonlenska» (Hopelandic) — einer Fantasie-Sprache ohne Bedeutung, die wie isländisch klingt.', url:'https://de.wikipedia.org/wiki/Sigur_Rós' },
+  { cat:'🌋 Geologie',  text:'Island wächst jedes Jahr um ca. 2 cm — die eurasische und nordamerikanische Platte driften am Mittelatlantischen Rücken auseinander. Bei Þingvellir kann man buchstäblich zwischen zwei Kontinenten stehen.', url:'https://de.wikipedia.org/wiki/Mittelatlantischer_Rücken' },
+  { cat:'🌋 Vulkane',   text:'Auf Island sind ~32 aktive Vulkansysteme bekannt. Der Eyjafjallajökull-Ausbruch 2010 legte fast den gesamten europäischen Flugverkehr lahm.', url:'https://de.wikipedia.org/wiki/Eyjafjallajökull' },
+  { cat:'🌊 Natur',     text:'In Island gibt es keine Mücken. Die Bedingungen sind für die meisten Mückenarten zu instabil — eine Ausnahme weltweit.', url:'https://en.wikipedia.org/wiki/Iceland#Fauna' },
+  { cat:'🐑 Bevölkerung', text:'Auf Island leben ca. 380\'000 Menschen — aber rund 800\'000 Schafe. Im Sommer streifen sie frei durchs Hochland.', url:'https://de.wikipedia.org/wiki/Island' },
+  { cat:'🧙 Folklore',  text:'Der isländische Glaube an Elfen reicht bis in die Sagazeit. Es gibt sogar eine «Elfenschule» in Reykjavík (Álfaskólinn).', url:'https://de.wikipedia.org/wiki/Elf_(Mythologie)' },
+  { cat:'📖 Sagas',     text:'Die isländischen Sagas (13. Jh.) gelten als eines der bedeutendsten literarischen Werke des Mittelalters — geschrieben in einer Sprache, die heutige Isländer noch lesen können.', url:'https://de.wikipedia.org/wiki/Isländersaga' },
+  { cat:'☕ Kultur',     text:'Island hat KEIN McDonald\'s. Der letzte schloss 2009 nach der Finanzkrise — der allerletzte Burger wird in einem Museum ausgestellt.', url:'https://www.bbc.com/news/world-europe-50334994' },
+  { cat:'☀️ Mitternachtssonne', text:'Im Juni geht die Sonne in Reykjavík ca. 3 Wochen praktisch nicht unter. Im Juli haben wir täglich 19–21 Stunden Tageslicht.', url:'https://de.wikipedia.org/wiki/Mitternachtssonne' },
+  { cat:'♨️ Geothermie', text:'85% aller isländischen Häuser werden geothermisch beheizt. Sogar Bürgersteige in Reykjavík sind beheizt — um Eis zu schmelzen.', url:'https://de.wikipedia.org/wiki/Geothermie_in_Island' },
+  { cat:'🐴 Pferde',    text:'Das Islandpferd beherrscht 5 Gangarten (statt der üblichen 3). Wer Island einmal verlässt, darf nie zurück — strenge Quarantäne-Regeln.', url:'https://de.wikipedia.org/wiki/Islandpferd' },
+  { cat:'🍶 Kulinarik', text:'Hákarl (fermentierter Grönlandhai) gilt als Nationalgericht. Anthony Bourdain nannte es «die ekligste Sache, die ich je gegessen habe».', url:'https://de.wikipedia.org/wiki/Hákarl' },
+  { cat:'📚 Lesen',     text:'Mehr Bücher pro Kopf werden in Island veröffentlicht als irgendwo sonst auf der Welt. Die Tradition «Jólabókaflóð» (Weihnachts-Buchflut) beschert jedem ein Buch zum Heiligabend.', url:'https://en.wikipedia.org/wiki/Jólabókaflóð' },
+];
+function showFact(i) {
+  const f = FACTS[i];
+  document.getElementById('fact-cat').textContent = f.cat;
+  document.getElementById('fact-text').textContent = f.text;
+  document.getElementById('fact-link').href = f.url;
+}
+let factIdx = Math.floor(Math.random() * FACTS.length);
+showFact(factIdx);
+document.getElementById('fact-next').onclick = () => { factIdx = (factIdx + 1 + Math.floor(Math.random() * (FACTS.length-1))) % FACTS.length; showFact(factIdx); };
 </script>
 </body>
 </html>
