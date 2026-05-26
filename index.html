@@ -37,6 +37,9 @@
   <!-- Weather -->
   <div class="card" id="weather-card" style="display:none;padding:1.1rem 1rem;margin-top:1rem"></div>
 
+  <!-- Road status -->
+  <div class="card" id="road-card" style="padding:1.1rem 1rem;margin-top:1rem"></div>
+
   <!-- Quick action -->
   <div style="margin-bottom:1.2rem">
     <a href="aktivitaeten.html" class="btn btn-secondary" style="text-decoration:none;font-size:.88rem;padding:.75rem;width:100%">✅ Aktivitäten</a>
@@ -195,6 +198,10 @@ async function loadWeather() {
   } catch(e) { /* silently hide */ }
 }
 loadWeather();
+
+// Road status
+document.getElementById('road-card').innerHTML = roadCardHTML('compact');
+tryLiveRoadStatus();
 </script>
 </body>
 </html>

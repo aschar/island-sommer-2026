@@ -20,6 +20,9 @@
     <p>Tankstellen, Strassen, Flussüberquerungen, Convoy-Regeln</p>
   </div>
 
+  <!-- Road status (live + legend) -->
+  <div class="card" id="road-card" style="padding:1.2rem;margin-bottom:1.4rem"></div>
+
   <!-- ⛽ Tankstellen -->
   <div class="section-label">⛽ Tankstellen</div>
   <div class="card">
@@ -120,6 +123,8 @@
 <script src="db.js"></script>
 <script>
 document.getElementById('nav-container').innerHTML = navHTML('fahren');
+document.getElementById('road-card').innerHTML = roadCardHTML('full');
+tryLiveRoadStatus();
 </script>
 </body>
 </html>

@@ -109,6 +109,43 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// ── Road status (road.is / Vegagerðin) ──────────────────────────────────────
+function roadCardHTML(variant) {
+  const legend = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem .8rem;font-size:.75rem;margin-bottom:.85rem">
+      <div style="display:flex;align-items:center;gap:.45rem"><span style="width:.65rem;height:.65rem;background:#5ade8a;border-radius:50%;flex-shrink:0"></span>Grün — befahrbar</div>
+      <div style="display:flex;align-items:center;gap:.45rem"><span style="width:.65rem;height:.65rem;background:#f0c060;border-radius:50%;flex-shrink:0"></span>Gelb — Vorsicht</div>
+      <div style="display:flex;align-items:center;gap:.45rem"><span style="width:.65rem;height:.65rem;background:#f08a3a;border-radius:50%;flex-shrink:0"></span>Orange — schwierig</div>
+      <div style="display:flex;align-items:center;gap:.45rem"><span style="width:.65rem;height:.65rem;background:#f06060;border-radius:50%;flex-shrink:0"></span>Rot — gesperrt</div>
+    </div>`;
+  const note = variant === 'full'
+    ? `<div style="font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:.85rem">Vor jeder langen Fahrt road.is checken. Bei gelb+ Vorsicht, bei rot nicht fahren. F-Strassen sind oft erst ab Ende Juni befahrbar.</div>`
+    : '';
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem">
+      <span style="font-weight:600;font-size:.95rem">🛣 Strassenstatus</span>
+      <span id="road-live" style="display:none;font-size:.7rem;color:var(--ice);background:rgba(74,143,168,.15);border-radius:99px;padding:.15rem .55rem"></span>
+    </div>
+    ${note}
+    ${legend}
+    <a href="https://umferd.is/" target="_blank" rel="noopener" class="btn btn-secondary" style="text-decoration:none;width:100%;justify-content:center;font-size:.85rem">→ road.is öffnen</a>`;
+}
+
+async function tryLiveRoadStatus() {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 3000);
+  try {
+    const res = await fetch('https://gagnaveita.vegagerdin.is/api/roadcondition', { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!res.ok) return;
+    const data = await res.json();
+    const el = document.getElementById('road-live');
+    if (!el || !data) return;
+    const segments = Array.isArray(data) ? data.length : (data.features?.length || null);
+    if (segments) { el.textContent = `Live · ${segments} Strecken`; el.style.display = 'inline-block'; }
+  } catch(e) { clearTimeout(t); /* silently keep static card */ }
+}
+
 // Shared nav HTML
 function navHTML(activePage) {
   return `
