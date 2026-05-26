@@ -41,9 +41,16 @@
 
   <!-- Quick actions -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:1.2rem">
-    <a href="ausgaben.html" class="btn btn-primary" style="text-decoration:none;font-size:.88rem;padding:.75rem">💸 Ausgabe erfassen</a>
+    <a href="https://splid.net/j/4PCL5HT9L" target="_blank" rel="noopener" class="btn btn-primary" style="text-decoration:none;font-size:.88rem;padding:.75rem">💸 Splid öffnen</a>
     <a href="aktivitaeten.html" class="btn btn-secondary" style="text-decoration:none;font-size:.88rem;padding:.75rem">✅ Aktivitäten</a>
   </div>
+
+  <!-- Splid info card -->
+  <a href="https://splid.net/j/4PCL5HT9L" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;color:inherit;text-align:center;padding:1.1rem;background:linear-gradient(135deg,#2a1a4a,#1a0f35);border-color:rgba(143,74,168,.3);margin-bottom:1.2rem">
+    <div style="font-size:.78rem;color:var(--muted)">Ausgaben werden über Splid getrackt</div>
+    <div style="font-weight:600;margin-top:.3rem">Island 2026 Sommer</div>
+    <div style="font-family:monospace;font-size:1.05rem;letter-spacing:.12rem;color:var(--ice);margin-top:.35rem">4PC L5H T9L</div>
+  </a>
 
   <!-- Phases -->
   <div class="section-label">Reisephasen</div>
@@ -53,15 +60,6 @@
   <div class="divider"></div>
   <div class="section-label">Letzte Ausgaben</div>
   <div id="recent-expenses"><div class="loading"><span class="spin">⟳</span> Laden…</div></div>
-
-  <!-- Balance preview -->
-  <div class="divider"></div>
-  <div class="section-label">Deine Bilanz</div>
-  <div id="my-balance" class="card" style="text-align:center">
-    <div style="font-size:.85rem;color:var(--muted)">Wähle deinen Namen oben um deine Bilanz zu sehen</div>
-  </div>
-
-  <a href="bilanz.html" class="btn btn-secondary" style="text-decoration:none;width:100%;margin-top:.5rem;justify-content:center">⚖️ Vollständige Bilanz →</a>
 
 </main>
 
@@ -100,7 +98,6 @@ TRIP.people.forEach(name => {
     setUser(name);
     document.getElementById('user-badge').textContent = name;
     document.getElementById('name-picker').style.display = 'none';
-    loadBalance();
     toast(`👋 Hallo ${name}!`);
   };
   chipsEl.appendChild(c);
@@ -157,26 +154,8 @@ async function loadRecent() {
   } catch(e) { el.innerHTML = '<div class="empty">Fehler beim Laden</div>'; }
 }
 
-async function loadBalance() {
-  const user = currentUser();
-  const el   = document.getElementById('my-balance');
-  if (!user) return;
-  try {
-    const expenses = await DB.select('island_expenses', 'select=*');
-    const net = calcBalances(expenses);
-    const val = net[user] || 0;
-    const cls = val > 0.5 ? 'balance-positive' : val < -0.5 ? 'balance-negative' : 'balance-zero';
-    const msg = val > 0.5 ? `Du bekommst CHF ${val.toFixed(2)} zurück` :
-                val < -0.5 ? `Du schuldest CHF ${Math.abs(val).toFixed(2)}` :
-                'Du bist ausgeglichen ✓';
-    el.innerHTML = `<div class="stat-val ${cls}" style="font-size:1.6rem">CHF ${Math.abs(val).toFixed(2)}</div>
-                    <div style="font-size:.85rem;color:var(--muted);margin-top:.4rem">${msg}</div>`;
-  } catch(e) {}
-}
-
 loadStats();
 loadRecent();
-if (currentUser()) loadBalance();
 </script>
 </body>
 </html>
