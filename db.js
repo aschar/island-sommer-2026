@@ -53,17 +53,60 @@ function setUser(name) {
   localStorage.setItem('island_user', name);
 }
 
-// Mark active nav item based on current page
+// ── Name picker (bottom sheet) ───────────────────────────────────────────────
+function openNamePicker() {
+  if (document.getElementById('name-picker-modal')) return;
+  const cur = currentUser();
+  const overlay = document.createElement('div');
+  overlay.id = 'name-picker-modal';
+  overlay.innerHTML = `
+    <div class="picker-backdrop"></div>
+    <div class="picker-sheet">
+      <div style="font-family:'Playfair Display',serif;font-size:1.15rem;text-align:center;margin-bottom:.3rem">Wer bist du?</div>
+      <div style="font-size:.8rem;color:var(--muted);text-align:center;margin-bottom:1rem">Auswahl wird gespeichert</div>
+      <div class="chips" id="picker-chips" style="justify-content:center;margin-bottom:1rem"></div>
+      <button class="btn btn-secondary" id="picker-cancel" style="width:100%">Abbrechen</button>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const chipsEl = document.getElementById('picker-chips');
+  TRIP.people.forEach(name => {
+    const c = document.createElement('div');
+    c.className = 'chip' + (name === cur ? ' selected' : '');
+    c.textContent = name;
+    c.onclick = () => {
+      setUser(name);
+      const badge = document.getElementById('user-badge');
+      if (badge) badge.textContent = name;
+      closeNamePicker();
+      toast(`👋 Hallo ${name}!`);
+      setTimeout(() => location.reload(), 450);
+    };
+    chipsEl.appendChild(c);
+  });
+  overlay.querySelector('.picker-backdrop').onclick = closeNamePicker;
+  document.getElementById('picker-cancel').onclick = closeNamePicker;
+}
+function closeNamePicker() {
+  const m = document.getElementById('name-picker-modal');
+  if (m) m.remove();
+}
+
+// Mark active nav item + restore badge + wire badge click
 document.addEventListener('DOMContentLoaded', () => {
   const page = location.pathname.split('/').pop().replace('.html','') || 'index';
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.page === page);
   });
 
-  // Restore user badge
   const u = currentUser();
   const badge = document.getElementById('user-badge');
-  if (badge && u) badge.textContent = u;
+  if (badge) {
+    if (u) badge.textContent = u;
+    badge.style.cursor = 'pointer';
+    badge.title = 'Tippen um Namen zu ändern';
+    badge.addEventListener('click', openNamePicker);
+  }
 });
 
 // Shared nav HTML
