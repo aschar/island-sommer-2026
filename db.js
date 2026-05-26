@@ -118,7 +118,12 @@ function roadCardHTML(variant) {
       <div style="display:flex;align-items:center;gap:.45rem"><span style="width:.65rem;height:.65rem;background:#f08a3a;border-radius:50%;flex-shrink:0"></span>Orange — schwierig</div>
       <div style="display:flex;align-items:center;gap:.45rem"><span style="width:.65rem;height:.65rem;background:#f06060;border-radius:50%;flex-shrink:0"></span>Rot — gesperrt</div>
     </div>`;
-  const note = variant === 'full'
+  const recap = `
+    <div style="font-size:.75rem;color:var(--muted);line-height:1.55;margin-bottom:.85rem;padding:.55rem .7rem;background:rgba(255,255,255,.03);border-radius:6px">
+      <strong style="color:var(--ice)">Was zeigt road.is?</strong><br>
+      Interaktive Islandkarte mit Strassen farbig nach Zustand · Wetterstationen (Wind + Temp) · Live-Webcams · F-Strassen-Status (offen/gesperrt). Update alle ~15 Min vom isländischen Strassendienst.
+    </div>`;
+  const fullNote = variant === 'full'
     ? `<div style="font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:.85rem">Vor jeder langen Fahrt road.is checken. Bei gelb+ Vorsicht, bei rot nicht fahren. F-Strassen sind oft erst ab Ende Juni befahrbar.</div>`
     : '';
   return `
@@ -126,7 +131,8 @@ function roadCardHTML(variant) {
       <span style="font-weight:600;font-size:.95rem">🛣 Strassenstatus</span>
       <span id="road-live" style="display:none;font-size:.7rem;color:var(--ice);background:rgba(74,143,168,.15);border-radius:99px;padding:.15rem .55rem"></span>
     </div>
-    ${note}
+    ${fullNote}
+    ${recap}
     ${legend}
     <a href="https://umferd.is/" target="_blank" rel="noopener" class="btn btn-secondary" style="text-decoration:none;width:100%;justify-content:center;font-size:.85rem">→ road.is öffnen</a>`;
 }

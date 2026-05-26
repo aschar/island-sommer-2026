@@ -163,13 +163,18 @@ phases.forEach(ph => {
   const hdr = document.createElement('div');
   const img = PHASE_IMAGES[ph];
   const bgStyle = img
-    ? `background-image:linear-gradient(rgba(15,25,35,.6),rgba(15,25,35,.82)),url('images/${img}');background-size:cover;background-position:center;min-height:130px;display:flex;flex-direction:column;justify-content:flex-end`
-    : `background:${PHASE_COLORS[ph]}33`;
+    ? `background-image:linear-gradient(rgba(15,25,35,.6),rgba(15,25,35,.82)),url('images/${img}');background-size:cover;background-position:center;min-height:140px;display:flex;flex-direction:column;justify-content:center;align-items:center`
+    : `background:${PHASE_COLORS[ph]}33;text-align:center`;
   const txtShadow = img ? ';text-shadow:0 1px 4px rgba(0,0,0,.65)' : '';
-  hdr.style.cssText = `${bgStyle};border-left:3px solid ${PHASE_COLORS[ph]};border-radius:var(--radius);padding:1.2rem 1.2rem;margin-bottom:1rem`;
+  hdr.style.cssText = `${bgStyle};border-left:3px solid ${PHASE_COLORS[ph]};border-radius:var(--radius);padding:1.3rem 1.2rem;margin-bottom:.7rem`;
   const phObj = TRIP.phases.find(p => p.id === ph);
-  hdr.innerHTML = `<h3 style="font-family:'Playfair Display',serif${txtShadow}">${PHASE_NAMES[ph]}</h3><p style="font-size:.8rem;opacity:.8${txtShadow}">${phObj ? phObj.dates : ''}</p>`;
+  hdr.innerHTML = `<h3 style="font-family:'Playfair Display',serif;text-align:center${txtShadow}">${PHASE_NAMES[ph]}</h3><p style="font-size:.8rem;opacity:.85;text-align:center${txtShadow}">${phObj ? phObj.dates : ''}</p>`;
   sec.appendChild(hdr);
+
+  const intro = document.createElement('div');
+  intro.style.cssText = 'background:rgba(74,143,168,.1);border:1px solid rgba(74,143,168,.3);border-radius:var(--radius);padding:.7rem 1rem;margin-bottom:1.1rem;font-size:.8rem;line-height:1.5;color:var(--ice);text-align:center';
+  intro.innerHTML = '📝 <strong>Wählt 1–2 Aktivitäten pro Ort</strong>, die ihr wirklich gemeinsam machen wollt. Daraus plane ich den Kern der Tour. Persönliche Extras könnt ihr natürlich zusätzlich machen.';
+  sec.appendChild(intro);
   
   ACTIVITIES[ph].forEach((act, idx) => {
     if (act.multi && (idx === 0 || !ACTIVITIES[ph][idx-1].multi)) {

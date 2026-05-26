@@ -32,7 +32,7 @@
   <div id="name-picker" style="display:none">
     <div class="page-header">
       <h2>Wer bist du?</h2>
-      <p>Einmalig auswählen — wird gespeichert</p>
+      <p>Einmalig auswählen, wird gespeichert</p>
     </div>
     <div class="chips" id="name-chips"></div>
     <div style="height:.8rem"></div>
@@ -40,9 +40,6 @@
 
   <!-- Weather -->
   <div class="card" id="weather-card" style="display:none;padding:1.1rem 1rem;margin-top:1rem"></div>
-
-  <!-- Road status -->
-  <div class="card" id="road-card" style="padding:1.1rem 1rem;margin-top:1rem"></div>
 
   <!-- Quick action -->
   <div style="margin-bottom:1.2rem">
@@ -63,11 +60,11 @@
     </div>
   </div>
 
-  <!-- Trip map (collapsed) -->
-  <details id="trip-map-details" class="card" style="padding:.85rem 1rem;margin-bottom:1.2rem">
+  <!-- Trip map (open by default) -->
+  <details id="trip-map-details" class="card" open style="padding:.85rem 1rem;margin-bottom:1.2rem">
     <summary style="cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;font-weight:600">
       <span>🗺 Reisekarte · 5 Stopps</span>
-      <span style="font-size:.75rem;color:var(--muted)" id="map-toggle-lbl">▼ Öffnen</span>
+      <span style="font-size:.75rem;color:var(--muted)" id="map-toggle-lbl">▲ Schliessen</span>
     </summary>
     <div id="trip-map" style="height:340px;border-radius:8px;margin-top:.85rem;background:rgba(255,255,255,.04)"></div>
     <div style="font-size:.7rem;color:var(--muted);text-align:right;margin-top:.4rem">© OpenStreetMap</div>
@@ -86,6 +83,10 @@
   <!-- Phases -->
   <div class="section-label">Reisephasen</div>
   <div id="phases-list"></div>
+
+  <!-- Road status (bottom) -->
+  <div class="divider" style="margin-top:1.8rem"></div>
+  <div class="card" id="road-card" style="padding:1.1rem 1rem"></div>
 
 </main>
 
@@ -269,27 +270,31 @@ function initTripMap() {
   L.polyline(pts, { color:'#4a8fa8', weight:2.5, dashArray:'6,8', opacity:.75 }).addTo(map);
   map.fitBounds(pts, { padding:[28,28] });
 }
-document.getElementById('trip-map-details').addEventListener('toggle', function() {
+const mapDetails = document.getElementById('trip-map-details');
+mapDetails.addEventListener('toggle', function() {
   document.getElementById('map-toggle-lbl').textContent = this.open ? '▲ Schliessen' : '▼ Öffnen';
   if (this.open) setTimeout(initTripMap, 80);
 });
+if (mapDetails.open) {
+  window.addEventListener('load', () => setTimeout(initTripMap, 100));
+}
 
 // ── Iceland fact rotator ────────────────────────────────────────────────────
 const FACTS = [
   { cat:'🧙 Folklore',  text:'Über die Hälfte der Isländer schliesst die Existenz der Huldufólk (verborgenes Volk) nicht aus. Strassen werden teilweise umgeleitet, um deren «Wohnsteine» nicht zu zerstören.', url:'https://de.wikipedia.org/wiki/Huldufólk' },
   { cat:'📚 Literatur', text:'Halldór Laxness erhielt 1955 den Literaturnobelpreis. Sein Roman «Sein eigener Herr» gilt als Schlüsselwerk der modernen isländischen Literatur.', url:'https://de.wikipedia.org/wiki/Halldór_Laxness' },
   { cat:'🎵 Musik',     text:'Björk wurde 1965 in Reykjavík geboren. Sie war Sängerin der Sugarcubes, bevor sie 1993 mit «Debut» ihre Solokarriere startete.', url:'https://de.wikipedia.org/wiki/Björk' },
-  { cat:'🎵 Musik',     text:'Sigur Rós singen oft in «Vonlenska» (Hopelandic) — einer Fantasie-Sprache ohne Bedeutung, die wie isländisch klingt.', url:'https://de.wikipedia.org/wiki/Sigur_Rós' },
-  { cat:'🌋 Geologie',  text:'Island wächst jedes Jahr um ca. 2 cm — die eurasische und nordamerikanische Platte driften am Mittelatlantischen Rücken auseinander. Bei Þingvellir kann man buchstäblich zwischen zwei Kontinenten stehen.', url:'https://de.wikipedia.org/wiki/Mittelatlantischer_Rücken' },
+  { cat:'🎵 Musik',     text:'Sigur Rós singen oft in «Vonlenska» (Hopelandic), einer Fantasie-Sprache ohne Bedeutung, die wie isländisch klingt.', url:'https://de.wikipedia.org/wiki/Sigur_Rós' },
+  { cat:'🌋 Geologie',  text:'Island wächst jedes Jahr um ca. 2 cm. Die eurasische und nordamerikanische Platte driften am Mittelatlantischen Rücken auseinander. Bei Þingvellir kann man buchstäblich zwischen zwei Kontinenten stehen.', url:'https://de.wikipedia.org/wiki/Mittelatlantischer_Rücken' },
   { cat:'🌋 Vulkane',   text:'Auf Island sind ~32 aktive Vulkansysteme bekannt. Der Eyjafjallajökull-Ausbruch 2010 legte fast den gesamten europäischen Flugverkehr lahm.', url:'https://de.wikipedia.org/wiki/Eyjafjallajökull' },
-  { cat:'🌊 Natur',     text:'In Island gibt es keine Mücken. Die Bedingungen sind für die meisten Mückenarten zu instabil — eine Ausnahme weltweit.', url:'https://en.wikipedia.org/wiki/Iceland#Fauna' },
-  { cat:'🐑 Bevölkerung', text:'Auf Island leben ca. 380\'000 Menschen — aber rund 800\'000 Schafe. Im Sommer streifen sie frei durchs Hochland.', url:'https://de.wikipedia.org/wiki/Island' },
+  { cat:'🌊 Natur',     text:'In Island gibt es keine Mücken. Die Bedingungen sind für die meisten Mückenarten zu instabil, eine Ausnahme weltweit.', url:'https://en.wikipedia.org/wiki/Iceland#Fauna' },
+  { cat:'🐑 Bevölkerung', text:'Auf Island leben ca. 380\'000 Menschen, aber rund 800\'000 Schafe. Im Sommer streifen sie frei durchs Hochland.', url:'https://de.wikipedia.org/wiki/Island' },
   { cat:'🧙 Folklore',  text:'Der isländische Glaube an Elfen reicht bis in die Sagazeit. Es gibt sogar eine «Elfenschule» in Reykjavík (Álfaskólinn).', url:'https://de.wikipedia.org/wiki/Elf_(Mythologie)' },
-  { cat:'📖 Sagas',     text:'Die isländischen Sagas (13. Jh.) gelten als eines der bedeutendsten literarischen Werke des Mittelalters — geschrieben in einer Sprache, die heutige Isländer noch lesen können.', url:'https://de.wikipedia.org/wiki/Isländersaga' },
-  { cat:'☕ Kultur',     text:'Island hat KEIN McDonald\'s. Der letzte schloss 2009 nach der Finanzkrise — der allerletzte Burger wird in einem Museum ausgestellt.', url:'https://www.bbc.com/news/world-europe-50334994' },
+  { cat:'📖 Sagas',     text:'Die isländischen Sagas (13. Jh.) gelten als eines der bedeutendsten literarischen Werke des Mittelalters. Geschrieben in einer Sprache, die heutige Isländer noch lesen können.', url:'https://de.wikipedia.org/wiki/Isländersaga' },
+  { cat:'☕ Kultur',     text:'Island hat KEIN McDonald\'s. Der letzte schloss 2009 nach der Finanzkrise. Der allerletzte Burger wird in einem Museum ausgestellt.', url:'https://www.bbc.com/news/world-europe-50334994' },
   { cat:'☀️ Mitternachtssonne', text:'Im Juni geht die Sonne in Reykjavík ca. 3 Wochen praktisch nicht unter. Im Juli haben wir täglich 19–21 Stunden Tageslicht.', url:'https://de.wikipedia.org/wiki/Mitternachtssonne' },
-  { cat:'♨️ Geothermie', text:'85% aller isländischen Häuser werden geothermisch beheizt. Sogar Bürgersteige in Reykjavík sind beheizt — um Eis zu schmelzen.', url:'https://de.wikipedia.org/wiki/Geothermie_in_Island' },
-  { cat:'🐴 Pferde',    text:'Das Islandpferd beherrscht 5 Gangarten (statt der üblichen 3). Wer Island einmal verlässt, darf nie zurück — strenge Quarantäne-Regeln.', url:'https://de.wikipedia.org/wiki/Islandpferd' },
+  { cat:'♨️ Geothermie', text:'85% aller isländischen Häuser werden geothermisch beheizt. Sogar Bürgersteige in Reykjavík sind beheizt, um Eis zu schmelzen.', url:'https://de.wikipedia.org/wiki/Geothermie_in_Island' },
+  { cat:'🐴 Pferde',    text:'Das Islandpferd beherrscht 5 Gangarten (statt der üblichen 3). Wer Island einmal verlässt, darf nie zurück. Strenge Quarantäne-Regeln.', url:'https://de.wikipedia.org/wiki/Islandpferd' },
   { cat:'🍶 Kulinarik', text:'Hákarl (fermentierter Grönlandhai) gilt als Nationalgericht. Anthony Bourdain nannte es «die ekligste Sache, die ich je gegessen habe».', url:'https://de.wikipedia.org/wiki/Hákarl' },
   { cat:'📚 Lesen',     text:'Mehr Bücher pro Kopf werden in Island veröffentlicht als irgendwo sonst auf der Welt. Die Tradition «Jólabókaflóð» (Weihnachts-Buchflut) beschert jedem ein Buch zum Heiligabend.', url:'https://en.wikipedia.org/wiki/Jólabókaflóð' },
 ];
