@@ -81,7 +81,7 @@ document.getElementById('nav-container').innerHTML = navHTML('aktivitaeten');
 
 const ACTIVITIES = {
   vest: [
-    { id:'v1', star:true,  name:'Vulkan & Papageientaucher-Tour (mit Ebbi)', desc:'⭐4.9 · Legendärer lokaler Guide. Eldfell-Vulkan, Papageientaucher, Küstenklippen. Sehr persönlich & emotional.', price:'CHF 87', dur:'2 Std.', de:false, urg:'urgent', multi:false },
+    { id:'v1', star:true,  name:'Vulkan & Papageientaucher-Tour (mit Ebbi)', desc:'⭐4.9 · Legendärer lokaler Guide. Eldfell-Vulkan, Papageientaucher, Küstenklippen. Sehr persönlich & emotional.', price:'CHF 87', dur:'2 Std.', de:false, en_only:true, urg:'urgent', multi:false },
     { id:'v2', star:false, name:'Bootsrundfahrt um die Inseln', desc:'⭐4.7 · Die Insel vom Meer aus erleben: Höhlen, Elefantenfelsen, Vogelklippen. Freie Stornierung.', price:'CHF 73', dur:'1.5 Std.', de:false, urg:'soon', multi:false },
     { id:'v3', star:false, name:'Vulkan-Quad / ATV-Tour', desc:'⭐4.8 · #1 Bestseller. Quad auf Vulkanasche zum Eldfell-Krater. Panoramablick über die Insel.', price:'CHF 108', dur:'1 Std.', de:false, urg:'soon', multi:false },
     { id:'v4', star:false, name:'Eldheimar Museum (Pompeii des Nordens)', desc:'Vulkanausbruch 1973 – fast die ganze Insel wurde begraben. Einzigartiges, berührendes Museum.', price:'CHF 20', dur:'1–2 Std.', de:false, urg:'flex', multi:false },
@@ -201,6 +201,7 @@ function buildCard(act) {
           <span class="tag ${priceClass}">${act.price}</span>
           <span class="tag tag-gray">⏱ ${act.dur}</span>
           ${act.de?'<span class="tag tag-green">🇩🇪 Deutsch</span>':''}
+          ${act.en_only?'<span class="tag tag-gray">🇬🇧 Nur Englisch</span>':''}
           <span class="tag ${urgClass}">${urgLabel}</span>
           ${act.multi?'<span class="tag tag-purple">🗺️ Mehrtages</span>':''}
         </div>
