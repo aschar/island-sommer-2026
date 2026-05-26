@@ -17,8 +17,8 @@
 <main class="page fade-up">
 
   <div class="page-header">
-    <h2>Driving Guide & Convoy</h2>
-    <p>Tankstellen, Strassen, Flussüberquerungen, Convoy-Regeln</p>
+    <h2>Driving Guide</h2>
+    <p>Tankstellen, Strassen, Flussüberquerungen, Wetter & Apps</p>
   </div>
 
   <!-- Road status (live + legend) -->
@@ -31,7 +31,8 @@
       <li>📟 <strong>Viele Stationen sind unbemannt</strong> (24/7 Automat) — Kreditkarte direkt am Zapfsäule, <strong>PIN immer nötig</strong>, keine Unterschrift</li>
       <li>🔁 <strong>Reihenfolge:</strong> Zapfsäule wählen → Karte stecken → PIN → tanken <span style="color:var(--muted)">(umgekehrt zur Schweiz)</span></li>
       <li>💳 Manche verlangen <strong>Vorautorisierung</strong> (~CHF 200 temporär eingefroren) — normal, wird nach 24h korrigiert</li>
-      <li>⛽ Wichtigste Ketten: <strong>N1, Orkan, Olís, Shell</strong> — <span style="color:var(--ice)">Costco</span> ist günstigster in Reykjavík</li>
+      <li>⛽ Wichtigste Ketten: <strong>N1, Orkan, Olís, Shell</strong>. <span style="color:var(--ice)">Costco</span> ist günstigster in Reykjavík</li>
+      <li>📱 <strong>Bensín-App</strong> zeigt Live-Preise aller Tankstellen Islands. Spart oft 5–15 ISK pro Liter.<br><a href="https://apps.apple.com/ua/app/bensin/id1495596809" target="_blank" rel="noopener" style="color:var(--glacier);font-size:.78rem">→ Bensín App (iOS)</a></li>
       <li>🛢️ <strong>Diesel = <em>dísill</em></strong> · Benzin = <em>bensín</em> — klar beschriftet.<br><span style="color:var(--muted)">Unsere Autos: Defender + Land Cruiser = Diesel</span></li>
       <li>📉 <strong>Nie unter halben Tank</strong> fahren — zwischen manchen Orten 100+ km ohne Station</li>
       <li>⛽ <strong>Immer volltanken</strong>, wenn ihr an einer Station seid — auch wenn noch ¾ voll</li>
@@ -76,22 +77,9 @@
     </ul>
   </div>
 
-  <!-- 🚗 Convoy Rules -->
-  <div class="section-label" style="margin-top:1.5rem">🚗 2-Auto Convoy Regeln</div>
-  <div class="card" style="background:rgba(74,143,168,.06);border-color:rgba(74,143,168,.35)">
-    <ul style="list-style:none;display:flex;flex-direction:column;gap:.65rem;font-size:.9rem;line-height:1.5">
-      <li>🔄 <strong>Lead Car rotiert täglich</strong> — setzt Tempo, wählt Stopps</li>
-      <li>⏱️ <strong>3-Minuten-Regel</strong> — Sichtkontakt verloren? Nach 3 min anhalten und warten</li>
-      <li>🚨 <strong>Stopp-Signal</strong> — 2× Warnblinker = "Ich muss stoppen, folgt mir"</li>
-      <li>📍 <strong>Lost Protocol</strong> — beide Autos stoppen, WhatsApp, Treffpunkt = letzter bekannter Wegpunkt</li>
-      <li>🚫 <strong>Kein Überholen</strong> ausser Notfall</li>
-      <li>☕ <strong>Morgen-Briefing (5 min)</strong> — Route, Tankplan, Mittagsstopp, Ankunftszeit. Beide Autos dabei.</li>
-    </ul>
-  </div>
-
   <!-- 📱 Apps -->
   <div class="section-label" style="margin-top:1.5rem">📱 Wichtige Apps</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6rem">
     <a href="https://road.is/" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;color:inherit;margin-bottom:0">
       <div style="font-weight:600;font-size:.92rem">road.is</div>
       <div style="font-size:.74rem;color:var(--muted);margin-top:.25rem">Strassenzustand <span class="tag tag-red" style="margin-left:.3rem">Pflicht</span></div>
@@ -99,6 +87,10 @@
     <a href="https://en.vedur.is/" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;color:inherit;margin-bottom:0">
       <div style="font-weight:600;font-size:.92rem">vedur.is</div>
       <div style="font-size:.74rem;color:var(--muted);margin-top:.25rem">Wetter Island <span class="tag tag-red" style="margin-left:.3rem">Pflicht</span></div>
+    </a>
+    <a href="https://apps.apple.com/ua/app/bensin/id1495596809" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;color:inherit;margin-bottom:0">
+      <div style="font-weight:600;font-size:.92rem">Bensín</div>
+      <div style="font-size:.74rem;color:var(--muted);margin-top:.25rem">Günstigster Sprit <span class="tag tag-orange" style="margin-left:.3rem">Empf.</span></div>
     </a>
     <a href="https://maps.me/" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;color:inherit;margin-bottom:0">
       <div style="font-weight:600;font-size:.92rem">maps.me</div>

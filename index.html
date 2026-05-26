@@ -45,23 +45,13 @@
     <a href="aktivitaeten.html" class="btn btn-secondary" style="text-decoration:none;font-size:.88rem;padding:.75rem;width:100%">✅ Aktivitäten</a>
   </div>
 
-  <!-- Splid card -->
-  <div class="card" style="padding:1.2rem;background:linear-gradient(135deg,#2a1a4a,#1a0f35);border-color:rgba(143,74,168,.3);margin-bottom:1.2rem">
-    <div style="font-family:'Playfair Display',serif;font-size:1.15rem;margin-bottom:.25rem">💸 Ausgaben — Splid</div>
-    <div style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">Wir tracken Ausgaben über Splid.</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem">
-      <a href="https://splid.net/j/4PCL5HT9L" target="_blank" rel="noopener" class="btn btn-primary" style="text-decoration:none;font-size:.85rem;padding:.7rem">Gruppe beitreten →</a>
-      <a href="https://splid.net/d" target="_blank" rel="noopener" class="btn btn-secondary" style="text-decoration:none;font-size:.85rem;padding:.7rem">App downloaden</a>
-    </div>
-    <div style="display:flex;justify-content:space-between;gap:.5rem;font-size:.78rem">
-      <div><span style="color:var(--muted)">Code:</span> <span style="font-family:monospace;color:var(--ice);letter-spacing:.1rem">4PC L5H T9L</span></div>
-      <div><span style="color:var(--muted)">Gruppe:</span> <span style="color:var(--ice)">Island 2026 Sommer</span></div>
-    </div>
-  </div>
+  <!-- Phases (FIRST major content) -->
+  <div class="section-label">Reisephasen</div>
+  <div id="phases-list"></div>
 
   <!-- Trip map (open by default) -->
-  <details id="trip-map-details" class="card" open style="padding:.85rem 1rem;margin-bottom:1.2rem">
-    <summary style="cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;font-weight:600">
+  <details id="trip-map-details" class="card" open style="padding:.85rem 1rem;margin-top:1.2rem;margin-bottom:1.2rem">
+    <summary style="cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;font-weight:600;min-height:36px">
       <span>🗺 Reisekarte · 5 Stopps</span>
       <span style="font-size:.75rem;color:var(--muted)" id="map-toggle-lbl">▲ Schliessen</span>
     </summary>
@@ -73,19 +63,29 @@
   <div class="card" id="fact-card" style="padding:1.1rem 1.2rem;margin-bottom:1.2rem;background:linear-gradient(135deg,rgba(74,143,168,.08),rgba(58,122,148,.05));border-color:rgba(74,143,168,.25)">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem">
       <span style="font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)" id="fact-cat">🧙 Wussten Sie schon?</span>
-      <button id="fact-next" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:99px;font-size:.7rem;padding:.2rem .65rem;cursor:pointer">↻ Nächste</button>
+      <button id="fact-next" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:99px;font-size:.7rem;padding:.35rem .75rem;cursor:pointer;min-height:32px">↻ Nächste</button>
     </div>
     <div id="fact-text" style="font-size:.92rem;line-height:1.55;margin-bottom:.55rem">…</div>
     <a id="fact-link" href="#" target="_blank" rel="noopener" style="font-size:.74rem;color:var(--ice);text-decoration:none">→ Mehr erfahren</a>
   </div>
 
-  <!-- Phases -->
-  <div class="section-label">Reisephasen</div>
-  <div id="phases-list"></div>
+  <!-- Road status -->
+  <div class="card" id="road-card" style="padding:1.1rem 1rem;margin-bottom:1.2rem"></div>
 
-  <!-- Road status (bottom) -->
-  <div class="divider" style="margin-top:1.8rem"></div>
-  <div class="card" id="road-card" style="padding:1.1rem 1rem"></div>
+  <!-- Splid card (END) -->
+  <div class="divider" style="margin-top:1.6rem"></div>
+  <div class="card" style="padding:1.2rem;background:linear-gradient(135deg,#2a1a4a,#1a0f35);border-color:rgba(143,74,168,.3)">
+    <div style="font-family:'Playfair Display',serif;font-size:1.15rem;margin-bottom:.25rem">💸 Ausgaben · Splid</div>
+    <div style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">Wir tracken Ausgaben über Splid.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem">
+      <a href="https://splid.net/j/4PCL5HT9L" target="_blank" rel="noopener" class="btn btn-primary" style="text-decoration:none;font-size:.85rem;padding:.7rem">Gruppe beitreten →</a>
+      <a href="https://splid.net/d" target="_blank" rel="noopener" class="btn btn-secondary" style="text-decoration:none;font-size:.85rem;padding:.7rem">App downloaden</a>
+    </div>
+    <div style="display:flex;justify-content:space-between;gap:.5rem;font-size:.78rem;flex-wrap:wrap">
+      <div><span style="color:var(--muted)">Code:</span> <span style="font-family:monospace;color:var(--ice);letter-spacing:.1rem">4PC L5H T9L</span></div>
+      <div><span style="color:var(--muted)">Gruppe:</span> <span style="color:var(--ice)">Island 2026 Sommer</span></div>
+    </div>
+  </div>
 
 </main>
 

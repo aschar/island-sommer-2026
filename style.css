@@ -24,7 +24,12 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
 
 body {
   font-family: 'DM Sans', sans-serif;
@@ -33,7 +38,15 @@ body {
   min-height: 100vh;
   padding-bottom: calc(env(safe-area-inset-bottom) + 1.5rem);
   overflow-x: hidden;
+  -webkit-tap-highlight-color: rgba(74,143,168,.25);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
+
+/* Minimum touch target for interactive elements */
+a, button, .chip, .nav-item, summary { touch-action: manipulation; }
+.topbar-nav .nav-item { min-height: 34px; }
+.topbar-badge { min-height: 32px; padding: .35rem .85rem; display: inline-flex; align-items: center; }
 
 /* ── TYPOGRAPHY ── */
 h1,h2,h3 { font-family: 'Playfair Display', serif; line-height: 1.15; }
