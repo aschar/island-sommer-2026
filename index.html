@@ -37,13 +37,6 @@
   <!-- Weather -->
   <div class="card" id="weather-card" style="display:none;padding:1.1rem 1rem;margin-top:1rem"></div>
 
-  <!-- Stats -->
-  <div class="stats-row" id="stats-row">
-    <div class="stat-card"><div class="stat-val" id="stat-spent">–</div><div class="stat-lbl">CHF ausgegeben</div></div>
-    <div class="stat-card"><div class="stat-val" id="stat-votes">–</div><div class="stat-lbl">Aktivitäts-Votes</div></div>
-    <div class="stat-card"><div class="stat-val" id="stat-exp">–</div><div class="stat-lbl">Ausgaben</div></div>
-  </div>
-
   <!-- Quick action -->
   <div style="margin-bottom:1.2rem">
     <a href="aktivitaeten.html" class="btn btn-secondary" style="text-decoration:none;font-size:.88rem;padding:.75rem;width:100%">✅ Aktivitäten</a>
@@ -66,11 +59,6 @@
   <!-- Phases -->
   <div class="section-label">Reisephasen</div>
   <div id="phases-list"></div>
-
-  <!-- Recent expenses -->
-  <div class="divider"></div>
-  <div class="section-label">Letzte Ausgaben</div>
-  <div id="recent-expenses"><div class="loading"><span class="spin">⟳</span> Laden…</div></div>
 
 </main>
 
@@ -137,49 +125,6 @@ TRIP.phases.forEach(ph => {
   d.innerHTML = `<h3>${ph.emoji} ${ph.name}</h3><p>${ph.dates}</p>`;
   phasesList.appendChild(d);
 });
-
-// ── Load data ────────────────────────────────────────────────────────────────
-async function loadStats() {
-  try {
-    const [expenses, votes] = await Promise.all([
-      DB.select('island_expenses', 'select=amount_chf'),
-      DB.select('island_trip_responses', 'select=id'),
-    ]);
-    const total = expenses.reduce((s,e) => s + parseFloat(e.amount_chf), 0);
-    document.getElementById('stat-spent').textContent = `${Math.round(total)}`;
-    document.getElementById('stat-votes').textContent = votes.length;
-    document.getElementById('stat-exp').textContent   = expenses.length;
-  } catch(e) { console.warn(e); }
-}
-
-async function loadRecent() {
-  const el = document.getElementById('recent-expenses');
-  try {
-    const expenses = await DB.select('island_expenses', 'select=*&limit=5');
-    if (!expenses.length) {
-      el.innerHTML = '<div class="empty"><span class="empty-icon">💸</span>Noch keine Ausgaben erfasst</div>';
-      return;
-    }
-    el.innerHTML = '';
-    expenses.forEach(exp => {
-      const d = document.createElement('div');
-      d.className = 'card fade-up';
-      d.style.padding = '.85rem 1rem';
-      d.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div>
-            <div style="font-weight:600;font-size:.9rem">${exp.description}</div>
-            <div style="font-size:.76rem;color:var(--muted);margin-top:.15rem">${exp.paid_by} · ${exp.category || ''} · ${exp.split_with.length} Pers.</div>
-          </div>
-          <div style="font-size:1.05rem;font-weight:700;color:var(--ice);white-space:nowrap;margin-left:.5rem">CHF ${parseFloat(exp.amount_chf).toFixed(2)}</div>
-        </div>`;
-      el.appendChild(d);
-    });
-  } catch(e) { el.innerHTML = '<div class="empty">Fehler beim Laden</div>'; }
-}
-
-loadStats();
-loadRecent();
 
 // ── Weather ──────────────────────────────────────────────────────────────────
 const WEATHER_LOCATIONS = {
