@@ -15,8 +15,8 @@ const TRIP = {
     { id:'laug', name:'Laugarás',       dates:'17.–20. Juli · 🛏 3 Nächte',           emoji:'♨️', color:'#1a4a2a', light:'#d5f5e3' },
     { id:'sued', name:'Südküste',       dates:'20.–23. Juli · 🛏 3 Nächte',           emoji:'🏔', color:'#4a2a1a', light:'#fdebd0',
       booking:'https://www.booking.com/hotel/is/house-in-fjordur-in-lon-south-east-of-iceland-birta-rentals.fr.html' },
-    { id:'haug', name:'Hauganes',       dates:'23.–27. Juli · 🛏 4 Nächte',           emoji:'🐋', color:'#2a1a4a', light:'#e8daef' },
-    { id:'reyk', name:'Reykjavík',      dates:'27. Juli – 3. August · 🛏 7 Nächte',   emoji:'🏙', color:'#0e3a3a', light:'#d1f2eb' },
+    { id:'haug', name:'Hauganes',       dates:'23.–28. Juli · 🛏 5 Nächte',           emoji:'🐋', color:'#2a1a4a', light:'#e8daef' },
+    { id:'reyk', name:'Reykjavík',      dates:'28. Juli – 3. August · 🛏 6 Nächte',   emoji:'🏙', color:'#0e3a3a', light:'#d1f2eb' },
   ],
 
   categories: ['🎯 Aktivität','🏠 Unterkunft','🚗 Transport','⛽ Benzin','🛒 Einkauf','🍽️ Essen & Trinken','🛍️ Shopping','📦 Sonstiges'],
