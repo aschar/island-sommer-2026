@@ -94,6 +94,28 @@ p  { line-height: 1.6; }
 .page-header { margin-bottom: 1.5rem; }
 .page-header p { color: var(--muted); font-size: .88rem; margin-top: .3rem; }
 
+/* ── HERO (full-bleed background) ── */
+.hero {
+  background-image: linear-gradient(rgba(15,25,35,.78), rgba(15,25,35,.88)), url('images/hero-ocean.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding: 1.75rem 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.hero-inner { max-width: 680px; margin: 0 auto; }
+@media (max-width: 768px) {
+  .hero { background-attachment: scroll; padding: 1.5rem 1rem 1.25rem; }
+}
+
+/* Phase-band with image background — text shadow for legibility */
+.phase-band.has-image h3,
+.phase-band.has-image p { text-shadow: 0 1px 3px rgba(0,0,0,.7); }
+.phase-band.has-image {
+  background-size: cover; background-position: center;
+  min-height: 96px; padding: 1.2rem 1.2rem;
+}
+
 /* ── CARDS ── */
 .card {
   background: var(--card);

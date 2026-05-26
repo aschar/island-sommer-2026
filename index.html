@@ -13,6 +13,15 @@
   <span class="topbar-badge" id="user-badge">Wer bist du?</span>
 </header>
 
+<!-- Hero (full-bleed) -->
+<section class="hero fade-up">
+  <div class="hero-inner" style="text-align:center">
+    <div style="font-size:2.6rem;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6)" id="countdown-num">–</div>
+    <div style="font-size:.88rem;color:rgba(255,255,255,.85);margin-top:.25rem;text-shadow:0 1px 4px rgba(0,0,0,.6)" id="countdown-lbl">Tage bis Island</div>
+    <div style="font-size:.78rem;color:rgba(255,255,255,.7);margin-top:.6rem;text-shadow:0 1px 4px rgba(0,0,0,.6)">15. Juli – 3. August 2026 · 20 Tage · 9 Abenteurer</div>
+  </div>
+</section>
+
 <main class="page fade-up">
 
   <!-- Name picker (shown if no user set) -->
@@ -23,13 +32,6 @@
     </div>
     <div class="chips" id="name-chips"></div>
     <div style="height:.8rem"></div>
-  </div>
-
-  <!-- Countdown -->
-  <div class="card" style="background:linear-gradient(135deg,#1a3a4a,#0f2535); border-color:rgba(74,143,168,.3); text-align:center; padding:1.4rem;">
-    <div style="font-size:2.2rem;font-weight:700;color:var(--ice)" id="countdown-num">–</div>
-    <div style="font-size:.82rem;color:var(--muted);margin-top:.2rem" id="countdown-lbl">Tage bis Island</div>
-    <div style="font-size:.78rem;color:var(--muted);margin-top:.5rem">15. Juli – 3. August 2026 · 20 Tage · 9 Abenteurer</div>
   </div>
 
   <!-- Weather -->
@@ -114,11 +116,24 @@ TRIP.people.forEach(name => {
 if (!currentUser()) document.getElementById('name-picker').style.display = 'block';
 
 // ── Phases ───────────────────────────────────────────────────────────────────
+const PHASE_IMAGES = {
+  vest: 'vest-puffins.jpeg',
+  laug: 'landmann.jpeg',
+  sued: 'sued-vestrahorn.jpeg',
+  haug: null, // no image yet
+  reyk: null, // keep teal gradient
+};
 const phasesList = document.getElementById('phases-list');
 TRIP.phases.forEach(ph => {
   const d = document.createElement('div');
-  d.className = 'phase-band';
-  d.style.cssText = `background:${ph.color}22;border-color:${ph.color};`;
+  const img = PHASE_IMAGES[ph.id];
+  if (img) {
+    d.className = 'phase-band has-image';
+    d.style.cssText = `background-image:linear-gradient(rgba(15,25,35,.65),rgba(15,25,35,.85)),url('images/${img}');border-color:${ph.color};`;
+  } else {
+    d.className = 'phase-band';
+    d.style.cssText = `background:${ph.color}22;border-color:${ph.color};`;
+  }
   d.innerHTML = `<h3>${ph.emoji} ${ph.name}</h3><p>${ph.dates}</p>`;
   phasesList.appendChild(d);
 });

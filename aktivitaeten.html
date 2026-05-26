@@ -121,6 +121,7 @@ const ACTIVITIES = {
 
 const PHASE_NAMES = { vest:'🌊 Vestmannaeyjar', laug:'♨️ Laugarás', sued:'🏔 Südküste', haug:'🐋 Hauganes', reyk:'🏙 Reykjavík' };
 const PHASE_COLORS = { vest:'#1a4a6a', laug:'#1a4a2a', sued:'#4a2a1a', haug:'#2a1a4a', reyk:'#0e3a3a' };
+const PHASE_IMAGES = { vest:'vest-puffins.jpeg', laug:'landmann.jpeg', sued:'sued-vestrahorn.jpeg', haug:null, reyk:null };
 let selections = {};
 let activePhase = 'vest';
 
@@ -160,9 +161,14 @@ phases.forEach(ph => {
   sec.style.display = ph === 'vest' ? 'block' : 'none';
   
   const hdr = document.createElement('div');
-  hdr.style.cssText = `background:${PHASE_COLORS[ph]}33;border-left:3px solid ${PHASE_COLORS[ph]};border-radius:var(--radius);padding:1rem 1.1rem;margin-bottom:1rem`;
+  const img = PHASE_IMAGES[ph];
+  const bgStyle = img
+    ? `background-image:linear-gradient(rgba(15,25,35,.6),rgba(15,25,35,.82)),url('images/${img}');background-size:cover;background-position:center;min-height:130px;display:flex;flex-direction:column;justify-content:flex-end`
+    : `background:${PHASE_COLORS[ph]}33`;
+  const txtShadow = img ? ';text-shadow:0 1px 4px rgba(0,0,0,.65)' : '';
+  hdr.style.cssText = `${bgStyle};border-left:3px solid ${PHASE_COLORS[ph]};border-radius:var(--radius);padding:1.2rem 1.2rem;margin-bottom:1rem`;
   const phObj = TRIP.phases.find(p => p.id === ph);
-  hdr.innerHTML = `<h3 style="font-family:'Playfair Display',serif">${PHASE_NAMES[ph]}</h3><p style="font-size:.78rem;opacity:.7">${phObj ? phObj.dates : ''}</p>`;
+  hdr.innerHTML = `<h3 style="font-family:'Playfair Display',serif${txtShadow}">${PHASE_NAMES[ph]}</h3><p style="font-size:.8rem;opacity:.8${txtShadow}">${phObj ? phObj.dates : ''}</p>`;
   sec.appendChild(hdr);
   
   ACTIVITIES[ph].forEach((act, idx) => {
