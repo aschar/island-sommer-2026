@@ -112,20 +112,15 @@ const PHASE_IMAGES = {
   vest: 'vest-puffins.jpeg',
   laug: 'landmann.jpeg',
   sued: 'sued-vestrahorn.jpeg',
-  haug: null, // no image yet
+  haug: null, // uses video below
   reyk: null, // keep teal gradient
+};
+const PHASE_VIDEOS = {
+  haug: 'hauganes-hottub.mp4',
 };
 const phasesList = document.getElementById('phases-list');
 TRIP.phases.forEach(ph => {
   const d = document.createElement('div');
-  const img = PHASE_IMAGES[ph.id];
-  if (img) {
-    d.className = 'phase-band has-image';
-    d.style.cssText = `background-image:linear-gradient(rgba(15,25,35,.65),rgba(15,25,35,.85)),url('images/${img}');border-color:${ph.color};`;
-  } else {
-    d.className = 'phase-band';
-    d.style.cssText = `background:${ph.color}22;border-color:${ph.color};`;
-  }
   const chipStyle = 'display:inline-block;margin:.5rem .35rem 0 0;font-size:.74rem;color:var(--ice);text-decoration:none;background:rgba(74,143,168,.18);border:1px solid rgba(74,143,168,.45);border-radius:99px;padding:.22rem .7rem;text-shadow:none';
   const bookingLink = ph.booking
     ? `<a href="${ph.booking}" target="_blank" rel="noopener" style="${chipStyle}">🏠 Unterkunft · ${ph.booking_label || 'Booking.com'} →</a>`
@@ -133,7 +128,22 @@ TRIP.phases.forEach(ph => {
   const mapLink = ph.map
     ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ph.map)}" target="_blank" rel="noopener" style="${chipStyle}">📍 Karte →</a>`
     : '';
-  d.innerHTML = `<h3>${ph.emoji} ${ph.name}</h3><p>${ph.dates}</p>${bookingLink}${mapLink}`;
+  const innerContent = `<h3>${ph.emoji} ${ph.name}</h3><p>${ph.dates}</p>${bookingLink}${mapLink}`;
+  const video = PHASE_VIDEOS[ph.id];
+  const img = PHASE_IMAGES[ph.id];
+  if (video) {
+    d.className = 'phase-band has-video';
+    d.style.cssText = `border-color:${ph.color};`;
+    d.innerHTML = `<video autoplay muted loop playsinline preload="metadata"><source src="images/${video}" type="video/mp4"></video><div class="phase-band-content">${innerContent}</div>`;
+  } else if (img) {
+    d.className = 'phase-band has-image';
+    d.style.cssText = `background-image:linear-gradient(rgba(15,25,35,.65),rgba(15,25,35,.85)),url('images/${img}');border-color:${ph.color};`;
+    d.innerHTML = innerContent;
+  } else {
+    d.className = 'phase-band';
+    d.style.cssText = `background:${ph.color}22;border-color:${ph.color};`;
+    d.innerHTML = innerContent;
+  }
   phasesList.appendChild(d);
 });
 
