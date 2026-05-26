@@ -89,7 +89,6 @@ const ACTIVITIES = {
   ],
   laug: [
     { id:'l1', star:true,  name:'Into the Glacier – Eistunnel Langjökull', desc:'Super-Jeep-Fahrt + Begehung eines Tunnels im Gletscher. Eiskapellen, Gletscherwände. 🇩🇪 Deutsch verfügbar!', price:'CHF 95', dur:'4–5 Std.', de:true, urg:'urgent', multi:false },
-    { id:'l2', star:false, name:'Goldener Kreis: Þingvellir, Geysir, Gullfoss', desc:'UNESCO-Welterbe, Strokkur-Geysir, mächtiger Gullfoss-Wasserfall. Mit eigenem Auto – nur Parkgebühren.', price:'CHF 10', dur:'Ganztag', de:false, urg:'flex', multi:false },
     { id:'l3', star:false, name:'Schnorcheln Silfra (zwischen zwei Kontinenten)', desc:'Weltberühmt. Schnorcheln in glasklarem Gletscherwasser zwischen zwei Kontinentalplatten. Neoprenanzug inklusive.', price:'CHF 165', dur:'4 Std.', de:false, urg:'urgent', multi:false },
     { id:'l4', star:false, name:'Sky Lagoon – geothermisches Meeresbad', desc:'Modernstes Bad Islands. Unendlicher Pool über dem Atlantik. 7-Schritte-Ritual. Besser & günstiger als Blue Lagoon.', price:'CHF 85', dur:'2–3 Std.', de:false, urg:'soon', multi:false },
     { id:'l5', star:false, name:'Lava-Höhlentour Raufarholshellir', desc:'Begehung eines 1360m langen Lavaröhrensystems. Farbenprächtige Strukturen, Eiszapfen. Nahe der Südroute.', price:'CHF 45', dur:'1.5 Std.', de:false, urg:'soon', multi:false },
@@ -111,7 +110,7 @@ const ACTIVITIES = {
     { id:'h7', star:false, name:'🗺️ MEHRTAGES: Grímsey-Insel (Polarkreis)', desc:'Fähre ab Dalvík → einziger isländischer Ort im Polarkreis. Mitternachtssonne, Papageientaucher, Polarkreis-Zertifikat!', price:'CHF 80–120', dur:'1–2 Tage', de:false, urg:'soon', multi:true },
   ],
   reyk: [
-    { id:'r1', star:true,  name:'Innipúkinn Musikfestival', desc:'Reykjavíks grösstes Stadtfest (Verslunarmannahelgi). Live-Musik, Konzerte im Freien. Teile kostenlos. Hauptkonzerte früh buchen!', price:'CHF 10–40', dur:'Mehrere Tage', de:false, urg:'soon', multi:false },
+    { id:'r1', star:true,  name:'Innipúkinn Musikfestival', desc:'📅 Nur am 1. August! Reykjavíks grösstes Stadtfest (Verslunarmannahelgi). Live-Musik, Konzerte im Freien. Teile kostenlos. Hauptkonzerte früh buchen!', price:'CHF 10–40', dur:'1. August', de:false, urg:'soon', multi:false },
     { id:'r2', star:false, name:'Snæfellsnes-Halbinsel (Tagesausflug)', desc:'Kirkjufell-Berg (Game of Thrones!), Snæfellsjökull-Gletscher (Jules Verne), Djúpalónssandur, Arnarstapi. «Island in Miniatur».', price:'CHF 110', dur:'11 Std.', de:false, urg:'soon', multi:false },
     { id:'r3', star:false, name:'Sky Lagoon (falls noch nicht besucht)', desc:'Perfekter Reiseabschluss: geothermisches Bad über dem Atlantik. 7-Schritte-Ritual. Ideal am letzten Abend.', price:'CHF 85', dur:'2–3 Std.', de:false, urg:'soon', multi:false },
     { id:'r4', star:false, name:'Walbeobachtung ab Reykjavík Hafen', desc:'Direkt ab Althafen. Buckelwale, Delfine, Papageientaucher. Kombinierbar mit Grandi-Viertel & Hafenspaziergang.', price:'CHF 80', dur:'3 Std.', de:false, urg:'soon', multi:false },
@@ -204,7 +203,6 @@ function buildCard(act) {
           ${act.de?'<span class="tag tag-green">🇩🇪 Deutsch</span>':''}
           <span class="tag ${urgClass}">${urgLabel}</span>
           ${act.multi?'<span class="tag tag-purple">🗺️ Mehrtages</span>':''}
-          ${act.star?'<span class="tag tag-orange">✈ Adrian bucht</span>':''}
         </div>
         <div class="results-row" id="votes-${act.id}"></div>
       </div>
