@@ -146,21 +146,23 @@ async function tryLiveRoadStatus() {
   } catch(e) { clearTimeout(t); /* silently keep static card */ }
 }
 
-// Shared nav HTML
+// Shared nav HTML (top, centered)
 function navHTML(activePage) {
   return `
-  <nav class="bottom-nav">
-    <a class="nav-item${activePage==='index'?' active':''}" href="index.html" data-page="index">
-      <span class="nav-icon">🏠</span><span>Übersicht</span>
-    </a>
-    <a class="nav-item${activePage==='aktivitaeten'?' active':''}" href="aktivitaeten.html" data-page="aktivitaeten">
-      <span class="nav-icon">✅</span><span>Aktivitäten</span>
-    </a>
-    <a class="nav-item${activePage==='fahren'?' active':''}" href="fahren.html" data-page="fahren">
-      <span class="nav-icon">🚗</span><span>Fahren</span>
-    </a>
-    <a class="nav-item" href="https://splid.net/j/4PCL5HT9L" target="_blank" rel="noopener">
-      <span class="nav-icon">💸</span><span>Splid</span>
-    </a>
-  </nav>`;
+  <div class="top-nav-wrap">
+    <nav class="top-nav">
+      <a class="nav-item${activePage==='index'?' active':''}" href="index.html" data-page="index">
+        <span class="nav-icon">🏠</span><span>Übersicht</span>
+      </a>
+      <a class="nav-item${activePage==='aktivitaeten'?' active':''}" href="aktivitaeten.html" data-page="aktivitaeten">
+        <span class="nav-icon">✅</span><span>Aktivitäten</span>
+      </a>
+      <a class="nav-item${activePage==='fahren'?' active':''}" href="fahren.html" data-page="fahren">
+        <span class="nav-icon">🚗</span><span>Fahren</span>
+      </a>
+      <a class="nav-item" href="https://splid.net/j/4PCL5HT9L" target="_blank" rel="noopener">
+        <span class="nav-icon">💸</span><span>Splid</span>
+      </a>
+    </nav>
+  </div>`;
 }
