@@ -32,6 +32,9 @@
     <div style="font-size:.78rem;color:var(--muted);margin-top:.5rem">15. Juli – 3. August 2026 · 20 Tage · 9 Abenteurer</div>
   </div>
 
+  <!-- Weather -->
+  <div class="card" id="weather-card" style="display:none;padding:1.1rem 1rem;margin-top:1rem"></div>
+
   <!-- Stats -->
   <div class="stats-row" id="stats-row">
     <div class="stat-card"><div class="stat-val" id="stat-spent">–</div><div class="stat-lbl">CHF ausgegeben</div></div>
@@ -156,6 +159,73 @@ async function loadRecent() {
 
 loadStats();
 loadRecent();
+
+// ── Weather ──────────────────────────────────────────────────────────────────
+const WEATHER_LOCATIONS = {
+  vest: { name: 'Vestmannaeyjar', lat: 63.44, lon: -20.27 },
+  laug: { name: 'Laugarás',       lat: 64.13, lon: -20.46 },
+  sued: { name: 'Vík',            lat: 63.42, lon: -19.01 },
+  haug: { name: 'Hauganes',       lat: 65.93, lon: -18.18 },
+  reyk: { name: 'Reykjavík',      lat: 64.13, lon: -21.82 },
+};
+const PHASE_START = {
+  vest: new Date('2026-07-15'),
+  laug: new Date('2026-07-17'),
+  sued: new Date('2026-07-20'),
+  haug: new Date('2026-07-23'),
+  reyk: new Date('2026-07-27'),
+};
+
+function activePhaseId() {
+  const now = new Date(); now.setHours(0,0,0,0);
+  if (now < TRIP.start_date || now > TRIP.end_date) return 'reyk';
+  let id = TRIP.phases[0].id;
+  TRIP.phases.forEach(ph => { if (now >= PHASE_START[ph.id]) id = ph.id; });
+  return id;
+}
+
+function weatherEmoji(code) {
+  if (code <= 2)  return '☀️';
+  if (code === 3) return '🌤';
+  if (code <= 9)  return '⛅';
+  if (code <= 19) return '🌧';
+  if (code <= 29) return '🌦';
+  if (code <= 39) return '💨';
+  if (code <= 49) return '🌫';
+  if (code <= 69) return '🌧';
+  if (code <= 79) return '🌨';
+  return '⛈';
+}
+
+async function loadWeather() {
+  const phId = activePhaseId();
+  const loc  = WEATHER_LOCATIONS[phId];
+  const url  = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=temperature_2m_max,temperature_2m_min,weathercode,windspeed_10m_max&timezone=Atlantic/Reykjavik&forecast_days=3`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(res.status);
+    const { daily: d } = await res.json();
+    const days = ['Heute', 'Morgen', 'Übermorgen'];
+    const cols = [0,1,2].map(i => `
+      <div style="text-align:center;padding:.6rem .3rem;background:rgba(255,255,255,.03);border-radius:8px">
+        <div style="font-size:.72rem;color:var(--muted)">${days[i]}</div>
+        <div style="font-size:1.7rem;line-height:1;margin:.35rem 0">${weatherEmoji(d.weathercode[i])}</div>
+        <div style="font-size:.88rem;font-weight:600;color:var(--ice)">${Math.round(d.temperature_2m_max[i])}° / ${Math.round(d.temperature_2m_min[i])}°</div>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:.25rem">💨 ${Math.round(d.windspeed_10m_max[i])} km/h</div>
+      </div>`).join('');
+    const card = document.getElementById('weather-card');
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem">
+        <span style="font-weight:600;font-size:.95rem">🌤 Wetter — ${loc.name}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem">${cols}</div>
+      <div style="text-align:center;margin-top:.7rem">
+        <a href="https://en.vedur.is/weather/forecasts/areas/" target="_blank" rel="noopener" style="font-size:.74rem;color:var(--muted);text-decoration:none">Vollständige Vorhersage → vedur.is</a>
+      </div>`;
+    card.style.display = 'block';
+  } catch(e) { /* silently hide */ }
+}
+loadWeather();
 </script>
 </body>
 </html>
