@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✅ Aktivitäten – Island 2026</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Activity card overrides */
+  .activity-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.1rem 1.2rem;
+    margin-bottom: .85rem; cursor: pointer; transition: all .18s;
+  }
+  .activity-card:hover  { border-color: rgba(200,220,232,.25); background: rgba(255,255,255,.07); }
+  .activity-card.checked { background: rgba(74,143,168,.15); border-color: var(--glacier); }
+  .activity-card.must-do { border-color: rgba(200,146,42,.3); }
+  .card-check {
+    width:22px;height:22px;border:2px solid var(--border);border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;margin-top:2px;transition:all .15s;font-size:.85rem;
+  }
+  .activity-card.checked .card-check { background:var(--glacier);border-color:var(--glacier); }
+  .phase-tabs { display:flex;overflow-x:auto;gap:.45rem;padding:.75rem 1rem;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);scrollbar-width:none; }
+  .phase-tabs::-webkit-scrollbar{display:none}
+  .phase-tab { white-space:nowrap;background:var(--card);border:1px solid var(--border);border-radius:99px;padding:.35rem .9rem;font-size:.78rem;cursor:pointer;color:var(--muted);flex-shrink:0;transition:all .18s; }
+  .phase-tab.active { background:var(--glacier);border-color:var(--glacier);color:#fff;font-weight:600; }
+  .section-divider-line{display:flex;align-items:center;gap:.6rem;margin:1.4rem 0 .8rem}
+  .section-divider-line span{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);white-space:nowrap}
+  .section-divider-line::before,.section-divider-line::after{content:'';flex:1;height:1px;background:var(--border)}
+  .results-row{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.6rem}
+  .vote-chip{background:rgba(74,143,168,.15);border:1px solid rgba(74,143,168,.3);border-radius:99px;padding:.15rem .55rem;font-size:.72rem;color:var(--ice)}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="topbar-title">✅ Aktivitäten</span>
+  <span class="topbar-badge" id="user-badge">–</span>
+</header>
+
+<div class="phase-tabs" id="phase-tabs"></div>
+
+<main style="max-width:680px;margin:0 auto;padding:1rem 1rem 1rem;padding-bottom:calc(var(--nav-h) + 1.5rem + env(safe-area-inset-bottom))">
+
+  <!-- Name picker -->
+  <div id="name-picker" style="display:none;margin-bottom:1.2rem">
+    <div class="card">
+      <div style="font-size:.88rem;color:var(--muted);margin-bottom:.7rem">👋 Wer bist du? (wird gespeichert)</div>
+      <div class="chips" id="name-chips"></div>
+    </div>
+  </div>
+
+  <!-- Phase sections injected by JS -->
+  <div id="phases-container"></div>
+
+  <!-- My summary -->
+  <div style="margin-top:1rem">
+    <div class="section-label">Meine Auswahl</div>
+    <div id="my-summary"></div>
+    <button class="btn btn-secondary" style="width:100%;margin-top:.6rem" onclick="copyMySelection()">📋 Auswahl für WhatsApp kopieren</button>
+    <button class="btn btn-primary" style="margin-top:.6rem" id="submit-btn" onclick="submitVotes()">Auswahl absenden ✓</button>
+  </div>
+
+  <!-- Group votes -->
+  <div style="margin-top:1.4rem">
+    <div class="section-label">Alle Stimmen <button class="btn btn-sm btn-secondary" onclick="loadGroupVotes()" style="margin-left:.5rem">Aktualisieren</button></div>
+    <div id="group-votes"><div class="loading"><span class="spin">⟳</span></div></div>
+  </div>
+
+</main>
+
+<div id="nav-container"></div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="db.js"></script>
+<script>
+document.getElementById('nav-container').innerHTML = navHTML('aktivitaeten');
+
+const ACTIVITIES = {
+  vest: [
+    { id:'v1', star:true,  name:'Vulkan & Papageientaucher-Tour (mit Ebbi)', desc:'⭐4.9 · Legendärer lokaler Guide. Eldfell-Vulkan, Papageientaucher, Küstenklippen. Sehr persönlich & emotional.', price:'CHF 87', dur:'2 Std.', de:false, urg:'urgent', multi:false },
+    { id:'v2', star:false, name:'Bootsrundfahrt um die Inseln', desc:'⭐4.7 · Die Insel vom Meer aus erleben: Höhlen, Elefantenfelsen, Vogelklippen. Freie Stornierung.', price:'CHF 73', dur:'1.5 Std.', de:false, urg:'soon', multi:false },
+    { id:'v3', star:false, name:'Vulkan-Quad / ATV-Tour', desc:'⭐4.8 · #1 Bestseller. Quad auf Vulkanasche zum Eldfell-Krater. Panoramablick über die Insel.', price:'CHF 108', dur:'1 Std.', de:false, urg:'soon', multi:false },
+    { id:'v4', star:false, name:'Eldheimar Museum (Pompeii des Nordens)', desc:'Vulkanausbruch 1973 – fast die ganze Insel wurde begraben. Einzigartiges, berührendes Museum.', price:'CHF 20', dur:'1–2 Std.', de:false, urg:'flex', multi:false },
+    { id:'v5', star:false, name:'🆓 Eldfell-Wanderung + Sandwich im Vulkan grillen', desc:'Kostenlos! Wanderung auf den Eldfell. Brot in geothermischer Erde (~80°C) backen. Echter Island-Spirit 🔥', price:'Gratis', dur:'2–3 Std.', de:false, urg:'flex', multi:false },
+  ],
+  laug: [
+    { id:'l1', star:true,  name:'Into the Glacier – Eistunnel Langjökull', desc:'Super-Jeep-Fahrt + Begehung eines Tunnels im Gletscher. Eiskapellen, Gletscherwände. 🇩🇪 Deutsch verfügbar!', price:'CHF 95', dur:'4–5 Std.', de:true, urg:'urgent', multi:false },
+    { id:'l2', star:false, name:'Goldener Kreis: Þingvellir, Geysir, Gullfoss', desc:'UNESCO-Welterbe, Strokkur-Geysir, mächtiger Gullfoss-Wasserfall. Mit eigenem Auto – nur Parkgebühren.', price:'CHF 10', dur:'Ganztag', de:false, urg:'flex', multi:false },
+    { id:'l3', star:false, name:'Schnorcheln Silfra (zwischen zwei Kontinenten)', desc:'Weltberühmt. Schnorcheln in glasklarem Gletscherwasser zwischen zwei Kontinentalplatten. Neoprenanzug inklusive.', price:'CHF 165', dur:'4 Std.', de:false, urg:'urgent', multi:false },
+    { id:'l4', star:false, name:'Sky Lagoon – geothermisches Meeresbad', desc:'Modernstes Bad Islands. Unendlicher Pool über dem Atlantik. 7-Schritte-Ritual. Besser & günstiger als Blue Lagoon.', price:'CHF 85', dur:'2–3 Std.', de:false, urg:'soon', multi:false },
+    { id:'l5', star:false, name:'Lava-Höhlentour Raufarholshellir', desc:'Begehung eines 1360m langen Lavaröhrensystems. Farbenprächtige Strukturen, Eiszapfen. Nahe der Südroute.', price:'CHF 45', dur:'1.5 Std.', de:false, urg:'soon', multi:false },
+  ],
+  sued: [
+    { id:'s1', star:true,  name:'Gletscherwanderung Sólheimajökull', desc:'Geführte Wanderung auf echtem Gletscher. Steigeisen + Helm inklusive. 🇩🇪 Deutsch verfügbar! Für alle Fitnesslevel.', price:'CHF 75', dur:'3–4 Std.', de:true, urg:'urgent', multi:false },
+    { id:'s2', star:false, name:'Super-Jeep Þórsmörk (Tal des Thor)', desc:'Extremer Geländewagen ins Hochland-Paradies. Gletscherflüsse, Vulkanasche, Bergpfade. Nur per Super-Jeep erreichbar!', price:'CHF 145', dur:'Ganztag', de:false, urg:'urgent', multi:false },
+    { id:'s3', star:false, name:'Landmannalaugar Hochland (Bus/Super-Jeep)', desc:'Farbige Rhyolith-Berge, natürliche Heissquellen zum Baden, Obsidian-Felder. Eines der schönsten Gebiete Islands.', price:'CHF 90', dur:'Ganztag', de:false, urg:'urgent', multi:false },
+    { id:'s4', star:false, name:'Reiten am schwarzen Strand', desc:'Islandpferde am Atlantik. Entspanntes Tempo, für Anfänger geeignet. Traumhaftes Setting.', price:'CHF 110', dur:'2–3 Std.', de:false, urg:'soon', multi:false },
+    { id:'s5', star:false, name:'🆓 Dyrhólaey + Reynisfjara Schwarzer Strand', desc:'Kostenlos. Dramatischer Felsbogen, Basaltsäulen, schwarzer Strand. Eines der fotogensten Motive Islands.', price:'Gratis', dur:'2 Std.', de:false, urg:'flex', multi:false },
+  ],
+  haug: [
+    { id:'h1', star:true,  name:'Walbeobachtung Hauganes (Eichenboot)', desc:'⭐Ältester Walbeobachter Islands (seit 1993). Wale oft nur Minuten entfernt. Buckelwale, Delfine. Direkt ab Selá!', price:'CHF 72', dur:'3 Std.', de:false, urg:'urgent', multi:false },
+    { id:'h2', star:false, name:'Mývatn Nature Baths', desc:'Geothermisches Bad am Mývatn-See. Ruhiger & authentischer als Blue Lagoon. + Pseudokrater & Dimmuborgir.', price:'CHF 50', dur:'2–3 Std.', de:false, urg:'soon', multi:false },
+    { id:'h3', star:false, name:'Forest Lagoon – Akureyri', desc:'Neues geothermisches Bad (2022) im Birkenwald. Blick über den Eyjafjörður. Sehr beliebt bei Einheimischen.', price:'CHF 58', dur:'2–3 Std.', de:false, urg:'soon', multi:false },
+    { id:'h4', star:false, name:'Husavik Walbeobachtung (Premium)', desc:'Husavik = Walhauptstadt Europas. 97%+ Sichtungsrate. 45 min von Selá. Für Wal-Enthusiasten die beste Option.', price:'CHF 105', dur:'3 Std.', de:false, urg:'urgent', multi:false },
+    { id:'h5', star:false, name:'Reiten im Eyjafjörður-Tal', desc:'Islandpferde durch das Fjordtal. Verschiedene Touren, Anfänger willkommen.', price:'CHF 115', dur:'2–4 Std.', de:false, urg:'soon', multi:false },
+    { id:'h6', star:false, name:'🗺️ MEHRTAGES: Westfjorde (2 Tage) — Untergruppe', desc:'Europas wildeste Ecke. Hólmavík → Drangsnes Gratis-Hotpots → Ísafjörður → Dynjandi-Wasserfall → Látrabjarg-Vogelklippen. 1–2 Übernachtungen. Rest bleibt in Selá.', price:'CHF 200–350', dur:'2–3 Tage', de:false, urg:'soon', multi:true },
+    { id:'h7', star:false, name:'🗺️ MEHRTAGES: Grímsey-Insel (Polarkreis)', desc:'Fähre ab Dalvík → einziger isländischer Ort im Polarkreis. Mitternachtssonne, Papageientaucher, Polarkreis-Zertifikat!', price:'CHF 80–120', dur:'1–2 Tage', de:false, urg:'soon', multi:true },
+  ],
+  reyk: [
+    { id:'r1', star:true,  name:'Innipúkinn Musikfestival', desc:'Reykjavíks grösstes Stadtfest (Verslunarmannahelgi). Live-Musik, Konzerte im Freien. Teile kostenlos. Hauptkonzerte früh buchen!', price:'CHF 10–40', dur:'Mehrere Tage', de:false, urg:'soon', multi:false },
+    { id:'r2', star:false, name:'Snæfellsnes-Halbinsel (Tagesausflug)', desc:'Kirkjufell-Berg (Game of Thrones!), Snæfellsjökull-Gletscher (Jules Verne), Djúpalónssandur, Arnarstapi. «Island in Miniatur».', price:'CHF 110', dur:'11 Std.', de:false, urg:'soon', multi:false },
+    { id:'r3', star:false, name:'Sky Lagoon (falls noch nicht besucht)', desc:'Perfekter Reiseabschluss: geothermisches Bad über dem Atlantik. 7-Schritte-Ritual. Ideal am letzten Abend.', price:'CHF 85', dur:'2–3 Std.', de:false, urg:'soon', multi:false },
+    { id:'r4', star:false, name:'Walbeobachtung ab Reykjavík Hafen', desc:'Direkt ab Althafen. Buckelwale, Delfine, Papageientaucher. Kombinierbar mit Grandi-Viertel & Hafenspaziergang.', price:'CHF 80', dur:'3 Std.', de:false, urg:'soon', multi:false },
+    { id:'r5', star:false, name:'🗺️ MEHRTAGES: Westfjorde (3-Tage-Tour geführt)', desc:'Geführte Kleingruppenreise: Dynjandi, Látrabjarg, Rauðisandur, Ísafjörður. 2 Nächte mit Frühstück. Muss SOFORT gebucht werden — Juli ist ausgebucht!', price:'CHF 900–1000', dur:'3 Tage', de:false, urg:'urgent', multi:true },
+    { id:'r6', star:false, name:'🗺️ MEHRTAGES: Snæfellsnes Übernachtung', desc:'Selbstfahrer: Kirkjufell bei Mitternachtssonne, Snæfellsjökull, Djúpalónssandur. Intimere Version des Tagesausflugs.', price:'CHF 150–200', dur:'2 Tage', de:false, urg:'soon', multi:true },
+  ],
+};
+
+const PHASE_NAMES = { vest:'🌊 Vestmannaeyjar', laug:'♨️ Laugarás', sued:'🏔 Südküste', haug:'🐋 Hauganes', reyk:'🏙 Reykjavík' };
+const PHASE_COLORS = { vest:'#1a4a6a', laug:'#1a4a2a', sued:'#4a2a1a', haug:'#2a1a4a', reyk:'#0e3a3a' };
+let selections = {};
+let activePhase = 'vest';
+
+// ── Name picker ──────────────────────────────────────────────────────────────
+const nameChipsEl = document.getElementById('name-chips');
+TRIP.people.forEach(name => {
+  const c = document.createElement('div');
+  c.className = 'chip'; c.textContent = name;
+  c.onclick = () => { setUser(name); document.getElementById('user-badge').textContent = name; document.getElementById('name-picker').style.display = 'none'; toast(`👋 Hallo ${name}!`); };
+  nameChipsEl.appendChild(c);
+});
+if (!currentUser()) document.getElementById('name-picker').style.display = 'block';
+else document.getElementById('user-badge').textContent = currentUser();
+
+// ── Phase tabs ────────────────────────────────────────────────────────────────
+const tabsEl = document.getElementById('phase-tabs');
+const phases = Object.keys(ACTIVITIES);
+phases.forEach(ph => {
+  const btn = document.createElement('button');
+  btn.className = 'phase-tab' + (ph === 'vest' ? ' active' : '');
+  btn.textContent = PHASE_NAMES[ph];
+  btn.onclick = () => switchPhase(ph, btn);
+  tabsEl.appendChild(btn);
+});
+// Summary tab
+const sumTab = document.createElement('button');
+sumTab.className = 'phase-tab';
+sumTab.id = 'sum-tab';
+sumTab.innerHTML = '✅ Auswahl <span id="count-badge" style="background:var(--lava);color:#fff;border-radius:99px;font-size:.65rem;font-weight:700;padding:.1rem .4rem;margin-left:.2rem">0</span>';
+tabsEl.appendChild(sumTab);
+
+// ── Build phase sections ───────────────────────────────────────────────────
+const container = document.getElementById('phases-container');
+phases.forEach(ph => {
+  const sec = document.createElement('div');
+  sec.id = `phase-${ph}`;
+  sec.style.display = ph === 'vest' ? 'block' : 'none';
+  
+  const hdr = document.createElement('div');
+  hdr.style.cssText = `background:${PHASE_COLORS[ph]}33;border-left:3px solid ${PHASE_COLORS[ph]};border-radius:var(--radius);padding:1rem 1.1rem;margin-bottom:1rem`;
+  const phObj = TRIP.phases.find(p => p.id === ph);
+  hdr.innerHTML = `<h3 style="font-family:'Playfair Display',serif">${PHASE_NAMES[ph]}</h3><p style="font-size:.78rem;opacity:.7">${phObj ? phObj.dates : ''}</p>`;
+  sec.appendChild(hdr);
+  
+  ACTIVITIES[ph].forEach((act, idx) => {
+    if (act.multi && (idx === 0 || !ACTIVITIES[ph][idx-1].multi)) {
+      const div = document.createElement('div');
+      div.className = 'section-divider-line';
+      div.innerHTML = '<span>🗺️ Mehrtages-Ausflüge</span>';
+      sec.appendChild(div);
+    }
+    sec.appendChild(buildCard(act));
+  });
+  container.appendChild(sec);
+});
+
+function buildCard(act) {
+  const card = document.createElement('div');
+  card.className = 'activity-card' + (act.star ? ' must-do' : '');
+  card.id = `card-${act.id}`;
+  card.onclick = () => toggle(act.id);
+  const urgClass = act.urg==='urgent'?'tag-red':act.urg==='soon'?'tag-orange':'tag-green';
+  const urgLabel = act.urg==='urgent'?'🔴 Jetzt buchen':act.urg==='soon'?'🟡 Bald':'🟢 Flexibel';
+  const priceClass = act.price==='Gratis'?'tag-green':'tag-gray';
+  card.innerHTML = `
+    <div style="display:flex;gap:.8rem;align-items:flex-start">
+      <div class="card-check" id="ck-${act.id}"></div>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:.91rem;margin-bottom:.25rem">${act.star?'⭐ ':''}${act.name}</div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:.55rem;line-height:1.45">${act.desc}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.3rem">
+          <span class="tag ${priceClass}">${act.price}</span>
+          <span class="tag tag-gray">⏱ ${act.dur}</span>
+          ${act.de?'<span class="tag tag-green">🇩🇪 Deutsch</span>':''}
+          <span class="tag ${urgClass}">${urgLabel}</span>
+          ${act.multi?'<span class="tag tag-purple">🗺️ Mehrtages</span>':''}
+          ${act.star?'<span class="tag tag-orange">✈ Adrian bucht</span>':''}
+        </div>
+        <div class="results-row" id="votes-${act.id}"></div>
+      </div>
+    </div>`;
+  return card;
+}
+
+function toggle(id) {
+  selections[id] = !selections[id];
+  const card = document.getElementById(`card-${id}`);
+  const ck   = document.getElementById(`ck-${id}`);
+  card.classList.toggle('checked', !!selections[id]);
+  ck.textContent = selections[id] ? '✓' : '';
+  updateCount();
+}
+
+function updateCount() {
+  const n = Object.values(selections).filter(Boolean).length;
+  const el = document.getElementById('count-badge');
+  if (el) el.textContent = n;
+  renderMySummary();
+}
+
+function switchPhase(ph, btn) {
+  phases.forEach(p => {
+    document.getElementById(`phase-${p}`).style.display = p === ph ? 'block' : 'none';
+  });
+  document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  activePhase = ph;
+}
+
+function renderMySummary() {
+  const el = document.getElementById('my-summary');
+  const chosen = [];
+  Object.entries(ACTIVITIES).forEach(([ph, acts]) => {
+    acts.filter(a => selections[a.id]).forEach(a => chosen.push({ ph, a }));
+  });
+  if (!chosen.length) { el.innerHTML = '<div style="color:var(--muted);font-size:.85rem;text-align:center;padding:.5rem">Noch nichts ausgewählt</div>'; return; }
+  let html = '';
+  chosen.forEach(({ph, a}) => {
+    html += `<div class="card" style="padding:.7rem 1rem;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-size:.88rem;font-weight:600">${a.name}</div><div style="font-size:.75rem;color:var(--muted)">${PHASE_NAMES[ph]} · ${a.price}</div></div>
+      <button onclick="toggle('${a.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem">✕</button>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+async function submitVotes() {
+  const user = currentUser();
+  if (!user) { toast('⚠️ Wähle zuerst deinen Namen'); return; }
+  const rows = [];
+  const PHASE_MAP = { vest:'Vestmannaeyjar', laug:'Laugarás', sued:'Südküste', haug:'Hauganes', reyk:'Reykjavík' };
+  Object.entries(ACTIVITIES).forEach(([ph, acts]) => {
+    acts.filter(a => selections[a.id]).forEach(a => {
+      rows.push({ person: user, phase: PHASE_MAP[ph], activity: a.name, price: a.price, duration: a.dur });
+    });
+  });
+  if (!rows.length) { toast('⚠️ Noch nichts ausgewählt'); return; }
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'Speichern…';
+  try {
+    await DB.insert('island_trip_responses', rows);
+    toast(`✅ ${rows.length} Aktivitäten gespeichert`);
+    loadGroupVotes();
+  } catch(e) { copyMySelection(); toast('Offline – in Zwischenablage kopiert'); }
+  btn.disabled = false; btn.textContent = 'Auswahl absenden ✓';
+}
+
+function copyMySelection() {
+  let text = `🇮🇸 Island 2026 – Aktivitäten von ${currentUser()}\n\n`;
+  Object.entries(ACTIVITIES).forEach(([ph, acts]) => {
+    const chosen = acts.filter(a => selections[a.id]);
+    if (!chosen.length) return;
+    text += `${PHASE_NAMES[ph]}\n`;
+    chosen.forEach(a => { text += `  • ${a.name} (${a.price})\n`; });
+    text += '\n';
+  });
+  navigator.clipboard.writeText(text).then(() => toast('📋 Kopiert!'));
+}
+
+async function loadGroupVotes() {
+  const el = document.getElementById('group-votes');
+  try {
+    const votes = await DB.select('island_trip_responses', 'select=*');
+    if (!votes.length) { el.innerHTML = '<div class="empty">Noch keine Stimmen</div>'; return; }
+    // Group by activity
+    const byAct = {};
+    votes.forEach(v => {
+      byAct[v.activity] = byAct[v.activity] || { phase: v.phase, people: [] };
+      if (!byAct[v.activity].people.includes(v.person)) byAct[v.activity].people.push(v.person);
+    });
+    const sorted = Object.entries(byAct).sort((a,b) => b[1].people.length - a[1].people.length);
+    el.innerHTML = '';
+    sorted.forEach(([act, data]) => {
+      const d = document.createElement('div');
+      d.className = 'card'; d.style.padding = '.8rem 1rem; margin-bottom:.6rem';
+      d.innerHTML = `
+        <div style="font-weight:600;font-size:.88rem;margin-bottom:.3rem">${act}</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.4rem">${data.phase} · ${data.people.length} Interessiert</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.3rem">
+          ${data.people.map(p=>`<span class="vote-chip">${p}</span>`).join('')}
+        </div>`;
+      el.appendChild(d);
+    });
+    // Also update vote chips on cards
+    Object.values(ACTIVITIES).flat().forEach(act => {
+      const vEl = document.getElementById(`votes-${act.id}`);
+      if (!vEl) return;
+      const data = byAct[act.name];
+      if (data && data.people.length) {
+        vEl.innerHTML = data.people.map(p=>`<span class="vote-chip">${p}</span>`).join('');
+      }
+    });
+  } catch(e) { el.innerHTML = '<div class="empty">Fehler</div>'; }
+}
+
+loadGroupVotes();
+</script>
+</body>
+</html>

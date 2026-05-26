@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🇮🇸 Island 2026</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <span class="topbar-title">🇮🇸 Island Sommer 2026</span>
+  <span class="topbar-badge" id="user-badge">Wer bist du?</span>
+</header>
+
+<main class="page fade-up">
+
+  <!-- Name picker (shown if no user set) -->
+  <div id="name-picker" style="display:none">
+    <div class="page-header">
+      <h2>Wer bist du?</h2>
+      <p>Einmalig auswählen — wird gespeichert</p>
+    </div>
+    <div class="chips" id="name-chips"></div>
+    <div style="height:.8rem"></div>
+  </div>
+
+  <!-- Countdown -->
+  <div class="card" style="background:linear-gradient(135deg,#1a3a4a,#0f2535); border-color:rgba(74,143,168,.3); text-align:center; padding:1.4rem;">
+    <div style="font-size:2.2rem;font-weight:700;color:var(--ice)" id="countdown-num">–</div>
+    <div style="font-size:.82rem;color:var(--muted);margin-top:.2rem" id="countdown-lbl">Tage bis Island</div>
+    <div style="font-size:.78rem;color:var(--muted);margin-top:.5rem">15. Juli – 3. August 2026 · 20 Tage · 9 Abenteurer</div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card"><div class="stat-val" id="stat-spent">–</div><div class="stat-lbl">CHF ausgegeben</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-votes">–</div><div class="stat-lbl">Aktivitäts-Votes</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-exp">–</div><div class="stat-lbl">Ausgaben</div></div>
+  </div>
+
+  <!-- Quick actions -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:1.2rem">
+    <a href="ausgaben.html" class="btn btn-primary" style="text-decoration:none;font-size:.88rem;padding:.75rem">💸 Ausgabe erfassen</a>
+    <a href="aktivitaeten.html" class="btn btn-secondary" style="text-decoration:none;font-size:.88rem;padding:.75rem">✅ Aktivitäten</a>
+  </div>
+
+  <!-- Phases -->
+  <div class="section-label">Reisephasen</div>
+  <div id="phases-list"></div>
+
+  <!-- Recent expenses -->
+  <div class="divider"></div>
+  <div class="section-label">Letzte Ausgaben</div>
+  <div id="recent-expenses"><div class="loading"><span class="spin">⟳</span> Laden…</div></div>
+
+  <!-- Balance preview -->
+  <div class="divider"></div>
+  <div class="section-label">Deine Bilanz</div>
+  <div id="my-balance" class="card" style="text-align:center">
+    <div style="font-size:.85rem;color:var(--muted)">Wähle deinen Namen oben um deine Bilanz zu sehen</div>
+  </div>
+
+  <a href="bilanz.html" class="btn btn-secondary" style="text-decoration:none;width:100%;margin-top:.5rem;justify-content:center">⚖️ Vollständige Bilanz →</a>
+
+</main>
+
+<div id="nav-container"></div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="db.js"></script>
+<script>
+document.getElementById('nav-container').innerHTML = navHTML('index');
+
+// ── Countdown ───────────────────────────────────────────────────────────────
+function updateCountdown() {
+  const now  = new Date();
+  const diff = TRIP.start_date - now;
+  const el   = document.getElementById('countdown-num');
+  const lbl  = document.getElementById('countdown-lbl');
+  if (diff <= 0) {
+    const end = TRIP.end_date - now;
+    if (end <= 0) { el.textContent='🏠'; lbl.textContent='Reise beendet'; }
+    else { el.textContent='🇮🇸'; lbl.textContent='Ihr seid auf Island!'; }
+  } else {
+    el.textContent = Math.ceil(diff / 86400000);
+    lbl.textContent = 'Tage bis Island';
+  }
+}
+updateCountdown();
+
+// ── Name picker ──────────────────────────────────────────────────────────────
+const chipsEl = document.getElementById('name-chips');
+TRIP.people.forEach(name => {
+  const c = document.createElement('div');
+  c.className = 'chip';
+  c.textContent = name;
+  c.onclick = () => {
+    setUser(name);
+    document.getElementById('user-badge').textContent = name;
+    document.getElementById('name-picker').style.display = 'none';
+    loadBalance();
+    toast(`👋 Hallo ${name}!`);
+  };
+  chipsEl.appendChild(c);
+});
+if (!currentUser()) document.getElementById('name-picker').style.display = 'block';
+
+// ── Phases ───────────────────────────────────────────────────────────────────
+const phasesList = document.getElementById('phases-list');
+TRIP.phases.forEach(ph => {
+  const d = document.createElement('div');
+  d.className = 'phase-band';
+  d.style.cssText = `background:${ph.color}22;border-color:${ph.color};`;
+  d.innerHTML = `<h3>${ph.emoji} ${ph.name}</h3><p>${ph.dates}</p>`;
+  phasesList.appendChild(d);
+});
+
+// ── Load data ────────────────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const [expenses, votes] = await Promise.all([
+      DB.select('island_expenses', 'select=amount_chf'),
+      DB.select('island_trip_responses', 'select=id'),
+    ]);
+    const total = expenses.reduce((s,e) => s + parseFloat(e.amount_chf), 0);
+    document.getElementById('stat-spent').textContent = `${Math.round(total)}`;
+    document.getElementById('stat-votes').textContent = votes.length;
+    document.getElementById('stat-exp').textContent   = expenses.length;
+  } catch(e) { console.warn(e); }
+}
+
+async function loadRecent() {
+  const el = document.getElementById('recent-expenses');
+  try {
+    const expenses = await DB.select('island_expenses', 'select=*&limit=5');
+    if (!expenses.length) {
+      el.innerHTML = '<div class="empty"><span class="empty-icon">💸</span>Noch keine Ausgaben erfasst</div>';
+      return;
+    }
+    el.innerHTML = '';
+    expenses.forEach(exp => {
+      const d = document.createElement('div');
+      d.className = 'card fade-up';
+      d.style.padding = '.85rem 1rem';
+      d.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-weight:600;font-size:.9rem">${exp.description}</div>
+            <div style="font-size:.76rem;color:var(--muted);margin-top:.15rem">${exp.paid_by} · ${exp.category || ''} · ${exp.split_with.length} Pers.</div>
+          </div>
+          <div style="font-size:1.05rem;font-weight:700;color:var(--ice);white-space:nowrap;margin-left:.5rem">CHF ${parseFloat(exp.amount_chf).toFixed(2)}</div>
+        </div>`;
+      el.appendChild(d);
+    });
+  } catch(e) { el.innerHTML = '<div class="empty">Fehler beim Laden</div>'; }
+}
+
+async function loadBalance() {
+  const user = currentUser();
+  const el   = document.getElementById('my-balance');
+  if (!user) return;
+  try {
+    const expenses = await DB.select('island_expenses', 'select=*');
+    const net = calcBalances(expenses);
+    const val = net[user] || 0;
+    const cls = val > 0.5 ? 'balance-positive' : val < -0.5 ? 'balance-negative' : 'balance-zero';
+    const msg = val > 0.5 ? `Du bekommst CHF ${val.toFixed(2)} zurück` :
+                val < -0.5 ? `Du schuldest CHF ${Math.abs(val).toFixed(2)}` :
+                'Du bist ausgeglichen ✓';
+    el.innerHTML = `<div class="stat-val ${cls}" style="font-size:1.6rem">CHF ${Math.abs(val).toFixed(2)}</div>
+                    <div style="font-size:.85rem;color:var(--muted);margin-top:.4rem">${msg}</div>`;
+  } catch(e) {}
+}
+
+loadStats();
+loadRecent();
+if (currentUser()) loadBalance();
+</script>
+</body>
+</html>

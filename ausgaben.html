@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💸 Ausgaben – Island 2026</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <span class="topbar-title">💸 Ausgaben</span>
+  <span class="topbar-badge" id="user-badge">–</span>
+</header>
+
+<main class="page fade-up">
+
+  <!-- Add expense form -->
+  <details id="add-form-wrap" open>
+    <summary style="cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <span style="font-family:'Playfair Display',serif;font-size:1.15rem">Ausgabe erfassen</span>
+      <span id="form-toggle-icon" style="color:var(--muted);font-size:.85rem">▲ Einklappen</span>
+    </summary>
+
+    <div class="card" style="padding:1.2rem">
+      <div class="form-group">
+        <label>Beschreibung</label>
+        <input type="text" id="f-desc" placeholder="z.B. Walbeobachtung Hauganes" />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem">
+        <div class="form-group">
+          <label>Betrag (CHF)</label>
+          <input type="number" id="f-amount" placeholder="0.00" step="0.01" min="0" />
+        </div>
+        <div class="form-group">
+          <label>Bezahlt von</label>
+          <select id="f-payer"></select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem">
+        <div class="form-group">
+          <label>Kategorie</label>
+          <select id="f-category"></select>
+        </div>
+        <div class="form-group">
+          <label>Phase</label>
+          <select id="f-phase">
+            <option value="">– Alle –</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Aufteilen mit</label>
+        <div class="chips" id="split-chips"></div>
+        <div style="display:flex;gap:.5rem;margin-top:.5rem">
+          <button class="btn btn-sm btn-secondary" onclick="selectAllPeople()">Alle</button>
+          <button class="btn btn-sm btn-secondary" onclick="select6People()">Nur 6 (ab 28. Juli)</button>
+          <button class="btn btn-sm btn-secondary" onclick="clearPeople()">Keine</button>
+        </div>
+      </div>
+      <div id="split-preview" style="font-size:.8rem;color:var(--muted);margin-bottom:.9rem;min-height:1.1rem"></div>
+      <button class="btn btn-primary" id="save-btn" onclick="saveExpense()">Ausgabe speichern</button>
+    </div>
+  </details>
+
+  <!-- Filter row -->
+  <div style="display:flex;gap:.5rem;overflow-x:auto;padding:.2rem 0;scrollbar-width:none;margin-bottom:1rem">
+    <button class="chip selected" data-filter="" onclick="setFilter(this,'')">Alle</button>
+    <button class="chip" data-filter="mine" onclick="setFilter(this,'mine')">Meine</button>
+    <script>
+      TRIP_PHASES_SCRIPT = true; // placeholder, filled below
+    </script>
+  </div>
+
+  <!-- Expense list -->
+  <div class="section-label" id="list-label">Ausgaben</div>
+  <div id="expense-list"><div class="loading"><span class="spin">⟳</span> Laden…</div></div>
+
+  <!-- Total -->
+  <div id="total-bar" style="display:none" class="card" style="text-align:center">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="color:var(--muted);font-size:.85rem">Total gefiltert</span>
+      <span id="total-val" style="font-size:1.2rem;font-weight:700;color:var(--ice)">CHF 0</span>
+    </div>
+  </div>
+
+</main>
+
+<div id="nav-container"></div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="db.js"></script>
+<script>
+document.getElementById('nav-container').innerHTML = navHTML('ausgaben');
+
+// ── Init selects & chips ─────────────────────────────────────────────────────
+const payerSel   = document.getElementById('f-payer');
+const catSel     = document.getElementById('f-category');
+const phaseSel   = document.getElementById('f-phase');
+const splitChips = document.getElementById('split-chips');
+
+TRIP.people.forEach(p => {
+  const o = document.createElement('option');
+  o.value = o.textContent = p;
+  payerSel.appendChild(o);
+});
+TRIP.categories.forEach(c => {
+  const o = document.createElement('option');
+  o.value = o.textContent = c;
+  catSel.appendChild(o);
+});
+TRIP.phases.forEach(ph => {
+  const o = document.createElement('option');
+  o.value = ph.name; o.textContent = `${ph.emoji} ${ph.name}`;
+  phaseSel.appendChild(o);
+  // filter buttons
+  const btn = document.createElement('button');
+  btn.className = 'chip';
+  btn.dataset.filter = ph.id;
+  btn.textContent = `${ph.emoji} ${ph.name}`;
+  btn.onclick = () => setFilter(btn, ph.id);
+  document.querySelector('[data-filter="mine"]').after(btn);
+});
+
+// Build split chips
+const selected = new Set(TRIP.people);
+TRIP.people.forEach(name => {
+  const c = document.createElement('div');
+  c.className = 'chip selected';
+  c.textContent = name;
+  c.dataset.name = name;
+  c.onclick = () => {
+    c.classList.toggle('selected');
+    if (c.classList.contains('selected')) selected.add(name);
+    else selected.delete(name);
+    updatePreview();
+  };
+  splitChips.appendChild(c);
+});
+
+function selectAllPeople() {
+  TRIP.people.forEach(n => { selected.add(n); splitChips.querySelector(`[data-name="${n}"]`).classList.add('selected'); });
+  updatePreview();
+}
+function select6People() {
+  selected.clear();
+  TRIP.people.forEach(n => splitChips.querySelector(`[data-name="${n}"]`).classList.remove('selected'));
+  TRIP.people_late.forEach(n => { selected.add(n); splitChips.querySelector(`[data-name="${n}"]`).classList.add('selected'); });
+  updatePreview();
+}
+function clearPeople() {
+  selected.clear();
+  splitChips.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  updatePreview();
+}
+
+function updatePreview() {
+  const amt = parseFloat(document.getElementById('f-amount').value) || 0;
+  const n   = selected.size;
+  const el  = document.getElementById('split-preview');
+  if (!n) { el.textContent = ''; return; }
+  el.textContent = n > 0 && amt > 0
+    ? `→ ${n} Personen · CHF ${(amt/n).toFixed(2)} pro Person`
+    : `→ ${n} Personen ausgewählt`;
+}
+document.getElementById('f-amount').addEventListener('input', updatePreview);
+
+// ── Prefill payer from current user ─────────────────────────────────────────
+const u = currentUser();
+if (u) payerSel.value = u;
+
+// ── Toggle form ──────────────────────────────────────────────────────────────
+document.getElementById('add-form-wrap').addEventListener('toggle', function() {
+  document.getElementById('form-toggle-icon').textContent =
+    this.open ? '▲ Einklappen' : '▼ Ausgabe erfassen';
+});
+
+// ── Save expense ─────────────────────────────────────────────────────────────
+async function saveExpense() {
+  const desc   = document.getElementById('f-desc').value.trim();
+  const amount = parseFloat(document.getElementById('f-amount').value);
+  const payer  = payerSel.value;
+  const cat    = catSel.value;
+  const phase  = phaseSel.value;
+
+  if (!desc)          return toast('⚠️ Beschreibung fehlt');
+  if (!amount || amount <= 0) return toast('⚠️ Betrag eingeben');
+  if (!selected.size) return toast('⚠️ Mind. 1 Person auswählen');
+
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true; btn.textContent = 'Speichern…';
+
+  try {
+    await DB.insert('island_expenses', {
+      paid_by: payer, description: desc,
+      amount_chf: amount, category: cat,
+      phase: phase || null,
+      split_with: Array.from(selected),
+    });
+    toast(`✅ CHF ${amount.toFixed(2)} gespeichert`);
+    document.getElementById('f-desc').value   = '';
+    document.getElementById('f-amount').value = '';
+    document.getElementById('add-form-wrap').open = false;
+    loadExpenses();
+  } catch(e) {
+    toast('❌ Fehler beim Speichern');
+  }
+  btn.disabled = false; btn.textContent = 'Ausgabe speichern';
+}
+
+// ── Filter & load ────────────────────────────────────────────────────────────
+let activeFilter = '';
+
+function setFilter(el, val) {
+  document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  activeFilter = val;
+  loadExpenses();
+}
+
+async function loadExpenses() {
+  const listEl = document.getElementById('expense-list');
+  listEl.innerHTML = '<div class="loading"><span class="spin">⟳</span> Laden…</div>';
+
+  try {
+    let data = await DB.select('island_expenses', 'select=*');
+    const me = currentUser();
+
+    if (activeFilter === 'mine') {
+      data = data.filter(e => e.paid_by === me || e.split_with.includes(me));
+    } else if (activeFilter) {
+      const ph = TRIP.phases.find(p => p.id === activeFilter);
+      if (ph) data = data.filter(e => e.phase === ph.name);
+    }
+
+    const total = data.reduce((s,e) => s + parseFloat(e.amount_chf), 0);
+    document.getElementById('list-label').textContent = `${data.length} Ausgabe${data.length !== 1 ? 'n' : ''} · CHF ${total.toFixed(2)} total`;
+
+    if (!data.length) {
+      listEl.innerHTML = '<div class="empty"><span class="empty-icon">💸</span>Noch keine Ausgaben</div>';
+      return;
+    }
+    listEl.innerHTML = '';
+    data.forEach(exp => {
+      const share = (parseFloat(exp.amount_chf) / exp.split_with.length).toFixed(2);
+      const d = document.createElement('div');
+      d.className = 'card fade-up';
+      d.style.padding = '.95rem 1.1rem';
+      d.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${exp.description}</div>
+            <div style="font-size:.76rem;color:var(--muted);margin-top:.2rem;display:flex;flex-wrap:wrap;gap:.3rem">
+              <span>💳 ${exp.paid_by}</span>
+              ${exp.phase ? `<span>· ${exp.phase}</span>` : ''}
+              <span>· ${exp.category || ''}</span>
+            </div>
+            <div style="font-size:.75rem;color:var(--muted);margin-top:.25rem">
+              ${exp.split_with.join(' · ')}
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:1.1rem;font-weight:700;color:var(--ice)">CHF ${parseFloat(exp.amount_chf).toFixed(2)}</div>
+            <div style="font-size:.72rem;color:var(--muted)">CHF ${share}/Pers.</div>
+            <button class="btn btn-danger btn-sm" style="margin-top:.4rem" onclick="deleteExpense('${exp.id}')">🗑</button>
+          </div>
+        </div>`;
+      listEl.appendChild(d);
+    });
+  } catch(e) {
+    listEl.innerHTML = '<div class="empty">Fehler beim Laden</div>';
+  }
+}
+
+async function deleteExpense(id) {
+  if (!confirm('Ausgabe löschen?')) return;
+  try {
+    await DB.delete('island_expenses', id);
+    toast('🗑 Gelöscht');
+    loadExpenses();
+  } catch(e) { toast('Fehler beim Löschen'); }
+}
+
+loadExpenses();
+</script>
+</body>
+</html>

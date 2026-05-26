@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚖️ Bilanz – Island 2026</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <span class="topbar-title">⚖️ Bilanz</span>
+  <span class="topbar-badge" id="user-badge">–</span>
+</header>
+
+<main class="page fade-up">
+
+  <div class="page-header">
+    <h2>Wer schuldet wem?</h2>
+    <p>Automatisch berechnet aus allen Ausgaben</p>
+  </div>
+
+  <div id="balance-content"><div class="loading"><span class="spin">⟳</span> Laden…</div></div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">Ausgleichsvorschläge</div>
+  <div id="settlements-content"><div class="loading"><span class="spin">⟳</span></div></div>
+
+  <div class="divider"></div>
+
+  <!-- Per category breakdown -->
+  <div class="section-label">Ausgaben nach Kategorie</div>
+  <div id="category-breakdown"></div>
+
+  <!-- Export -->
+  <div class="divider"></div>
+  <button class="btn btn-secondary" style="width:100%" onclick="exportToClipboard()">📋 Bilanz für WhatsApp kopieren</button>
+
+</main>
+
+<div id="nav-container"></div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="db.js"></script>
+<script>
+document.getElementById('nav-container').innerHTML = navHTML('bilanz');
+
+let allExpenses = [];
+
+async function loadAll() {
+  try {
+    allExpenses = await DB.select('island_expenses', 'select=*');
+    renderBalances();
+    renderSettlements();
+    renderCategories();
+  } catch(e) {
+    document.getElementById('balance-content').innerHTML = '<div class="empty">Fehler beim Laden</div>';
+  }
+}
+
+function renderBalances() {
+  const el  = document.getElementById('balance-content');
+  const net = calcBalances(allExpenses);
+  const me  = currentUser();
+
+  if (!allExpenses.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-icon">⚖️</span>Noch keine Ausgaben erfasst</div>';
+    return;
+  }
+
+  el.innerHTML = '';
+  const sorted = Object.entries(net).sort((a,b) => b[1] - a[1]);
+
+  sorted.forEach(([person, val]) => {
+    if (Math.abs(val) < 0.01) return; // skip zero
+    const isMe = person === me;
+    const cls  = val > 0 ? 'balance-positive' : 'balance-negative';
+    const msg  = val > 0 ? `bekommt CHF ${val.toFixed(2)} zurück` : `schuldet CHF ${Math.abs(val).toFixed(2)}`;
+    const d = document.createElement('div');
+    d.className = 'card';
+    d.style.cssText = isMe ? 'border-color:var(--glacier);background:rgba(74,143,168,.08)' : '';
+    d.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <span style="font-weight:600;font-size:.95rem">${person}</span>
+          ${isMe ? '<span class="tag tag-blue" style="margin-left:.4rem">Du</span>' : ''}
+          <div style="font-size:.78rem;color:var(--muted);margin-top:.15rem">${msg}</div>
+        </div>
+        <div class="${cls}" style="font-size:1.25rem;font-weight:700">
+          ${val > 0 ? '+' : ''}CHF ${val.toFixed(2)}
+        </div>
+      </div>`;
+    el.appendChild(d);
+  });
+
+  // Show people at zero too
+  sorted.filter(([,v]) => Math.abs(v) < 0.01).forEach(([person]) => {
+    const d = document.createElement('div');
+    d.className = 'card';
+    d.style.padding = '.7rem 1.1rem';
+    d.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:.88rem">${person}</span>
+      <span class="balance-zero" style="font-size:.88rem">✓ ausgeglichen</span>
+    </div>`;
+    el.appendChild(d);
+  });
+}
+
+function renderSettlements() {
+  const el = document.getElementById('settlements-content');
+  if (!allExpenses.length) { el.innerHTML = ''; return; }
+
+  const net  = calcBalances(allExpenses);
+  const list = calcSettlements(net);
+
+  if (!list.length) {
+    el.innerHTML = '<div class="card" style="text-align:center;color:var(--muted);font-size:.88rem">🎉 Alle ausgeglichen!</div>';
+    return;
+  }
+
+  el.innerHTML = '';
+  list.forEach(s => {
+    const d = document.createElement('div');
+    d.className = 'card';
+    d.style.padding = '.85rem 1.1rem';
+    d.innerHTML = `
+      <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+        <span style="font-weight:600">${s.from}</span>
+        <span style="color:var(--muted);font-size:.85rem">zahlt</span>
+        <span style="font-weight:600;color:var(--glacier)">CHF ${s.amount.toFixed(2)}</span>
+        <span style="color:var(--muted);font-size:.85rem">an</span>
+        <span style="font-weight:600">${s.to}</span>
+      </div>`;
+    el.appendChild(d);
+  });
+}
+
+function renderCategories() {
+  const el = document.getElementById('category-breakdown');
+  if (!allExpenses.length) return;
+
+  const bycat = {};
+  allExpenses.forEach(e => {
+    const k = e.category || 'Sonstiges';
+    bycat[k] = (bycat[k] || 0) + parseFloat(e.amount_chf);
+  });
+  const total = Object.values(bycat).reduce((a,b)=>a+b, 0);
+  const sorted = Object.entries(bycat).sort((a,b)=>b[1]-a[1]);
+
+  sorted.forEach(([cat, amt]) => {
+    const pct = total ? (amt/total*100) : 0;
+    const d = document.createElement('div');
+    d.style.marginBottom = '.5rem';
+    d.innerHTML = `
+      <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.2rem">
+        <span>${cat}</span>
+        <span style="color:var(--ice)">CHF ${amt.toFixed(2)} <span style="color:var(--muted)">(${pct.toFixed(0)}%)</span></span>
+      </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:var(--glacier);border-radius:3px;transition:width .4s"></div>
+      </div>`;
+    el.appendChild(d);
+  });
+
+  const totalCard = document.createElement('div');
+  totalCard.className = 'card';
+  totalCard.style.cssText = 'margin-top:.8rem;display:flex;justify-content:space-between;align-items:center';
+  totalCard.innerHTML = `<span style="color:var(--muted)">Gesamt</span><strong style="font-size:1.2rem;color:var(--ice)">CHF ${total.toFixed(2)}</strong>`;
+  el.appendChild(totalCard);
+}
+
+function exportToClipboard() {
+  const net  = calcBalances(allExpenses);
+  const list = calcSettlements(net);
+  let text = `⚖️ Island 2026 – Bilanz\n\n`;
+  text += `💰 Ausgaben:\n`;
+  Object.entries(net).sort((a,b)=>b[1]-a[1]).forEach(([p,v]) => {
+    if (Math.abs(v) < 0.01) return;
+    text += `  ${p}: ${v > 0 ? '+' : ''}CHF ${v.toFixed(2)}\n`;
+  });
+  text += `\n💸 Ausgleich:\n`;
+  if (!list.length) text += '  Alle ausgeglichen! 🎉\n';
+  list.forEach(s => { text += `  ${s.from} → ${s.to}: CHF ${s.amount.toFixed(2)}\n`; });
+  text += `\nTotal: CHF ${allExpenses.reduce((s,e)=>s+parseFloat(e.amount_chf),0).toFixed(2)}`;
+  navigator.clipboard.writeText(text).then(() => toast('📋 Kopiert!'));
+}
+
+loadAll();
+</script>
+</body>
+</html>
