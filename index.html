@@ -122,7 +122,10 @@ TRIP.phases.forEach(ph => {
     d.className = 'phase-band';
     d.style.cssText = `background:${ph.color}22;border-color:${ph.color};`;
   }
-  d.innerHTML = `<h3>${ph.emoji} ${ph.name}</h3><p>${ph.dates}</p>`;
+  const bookingLink = ph.booking
+    ? `<a href="${ph.booking}" target="_blank" rel="noopener" style="display:inline-block;margin-top:.5rem;font-size:.74rem;color:var(--ice);text-decoration:none;background:rgba(74,143,168,.18);border:1px solid rgba(74,143,168,.45);border-radius:99px;padding:.22rem .7rem;text-shadow:none">🏠 Unterkunft auf Booking.com →</a>`
+    : '';
+  d.innerHTML = `<h3>${ph.emoji} ${ph.name}</h3><p>${ph.dates}</p>${bookingLink}`;
   phasesList.appendChild(d);
 });
 
