@@ -11,7 +11,7 @@ const TRIP = {
 
   phases: [
     { id:'vest', name:'Vestmannaeyjar', dates:'15.–17. Juli · 🛏 2 Nächte',           emoji:'🌊', color:'#1a4a6a', light:'#d6eaf8',
-      booking:'https://secure.booking.com/confirmation.fr.html?label=fr-ch-booking-desktop-pNsapuasFxmB0Q2VQRL5ewS652796014221%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-65526620%3Alp9188707%3Ali%3Adec%3Adm&sid=7d548b277a6abe1e3643e6f8b8675366&gclid=CjwKCAjw5s_QBhAdEiwADD_gBpwUEKqp0Kllmws_z48_gqnr0UMQGd0klIKGmcc8ZPO8Q2dd8bOkJRoCTs0QAvD_BwE&aid=2311236&auth_key=KGp8ioVXnd1iBXtM&source=mytrips' },
+      booking:'https://www.booking.com/hotel/is/westman-luxury-villas.fr.html' },
     { id:'laug', name:'Laugarás',       dates:'17.–20. Juli · 🛏 3 Nächte',           emoji:'♨️', color:'#1a4a2a', light:'#d5f5e3' },
     { id:'sued', name:'Südküste',       dates:'20.–23. Juli · 🛏 3 Nächte',           emoji:'🏔', color:'#4a2a1a', light:'#fdebd0',
       booking:'https://www.booking.com/hotel/is/house-in-fjordur-in-lon-south-east-of-iceland-birta-rentals.fr.html' },
