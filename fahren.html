@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚗 Fahren – Island 2026</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <span class="topbar-title">🚗 Fahren in Island</span>
+  <span class="topbar-badge" id="user-badge">–</span>
+</header>
+
+<main class="page fade-up">
+
+  <div class="page-header">
+    <h2>Driving Guide & Convoy</h2>
+    <p>Tankstellen, Strassen, Flussüberquerungen, Convoy-Regeln</p>
+  </div>
+
+  <!-- ⛽ Tankstellen -->
+  <div class="section-label">⛽ Tankstellen</div>
+  <div class="card">
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:.65rem;font-size:.9rem;line-height:1.5">
+      <li>📟 <strong>Viele Stationen sind unbemannt</strong> (24/7 Automat) — Kreditkarte direkt am Zapfsäule, <strong>PIN immer nötig</strong>, keine Unterschrift</li>
+      <li>🔁 <strong>Reihenfolge:</strong> Zapfsäule wählen → Karte stecken → PIN → tanken <span style="color:var(--muted)">(umgekehrt zur Schweiz)</span></li>
+      <li>💳 Manche verlangen <strong>Vorautorisierung</strong> (~CHF 200 temporär eingefroren) — normal, wird nach 24h korrigiert</li>
+      <li>⛽ Wichtigste Ketten: <strong>N1, Orkan, Olís, Shell</strong> — <span style="color:var(--ice)">Costco</span> ist günstigster in Reykjavík</li>
+      <li>🛢️ <strong>Diesel = <em>dísill</em></strong> · Benzin = <em>bensín</em> — klar beschriftet.<br><span style="color:var(--muted)">Unsere Autos: Defender + Land Cruiser = Diesel</span></li>
+      <li>📉 <strong>Nie unter halben Tank</strong> fahren — zwischen manchen Orten 100+ km ohne Station</li>
+      <li>⛽ <strong>Immer volltanken</strong>, wenn ihr an einer Station seid — auch wenn noch ¾ voll</li>
+    </ul>
+  </div>
+
+  <!-- 🛣️ Strassen -->
+  <div class="section-label" style="margin-top:1.5rem">🛣️ Strassen</div>
+  <div class="card">
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:.65rem;font-size:.9rem;line-height:1.5">
+      <li><strong>F-Strassen</strong> = Hochland-Pisten, nur bei guten Bedingungen befahrbar</li>
+      <li><strong>Schotterpisten</strong> (Gravel) = langsam fahren, <span style="color:#f0c060">Steinschlag-Risiko</span> für Windschutzscheibe</li>
+      <li><strong>Einspurige Brücken</strong> — wer zuerst drauf ist hat Vorfahrt, andere warten</li>
+      <li>🐑 <strong>Schafe können jederzeit auf der Strasse sein</strong> — wirklich. Nicht hupen, langsam vorbeifahren</li>
+    </ul>
+  </div>
+
+  <!-- 🌊 Flussüberquerungen — WARNING CARD -->
+  <div class="section-label" style="margin-top:1.5rem;color:#f0c060">⚠️ Flussüberquerungen (F-Strassen)</div>
+  <div class="card" style="background:linear-gradient(135deg,rgba(200,146,42,.14),rgba(120,80,20,.18));border:1.5px solid rgba(200,146,42,.55);position:relative;padding-top:1.4rem">
+    <span class="tag tag-orange" style="position:absolute;top:-.6rem;left:1.2rem;font-weight:700;letter-spacing:.05em">⚠️ KRITISCH</span>
+    <p style="font-size:.85rem;color:#f0c060;margin-bottom:.9rem;font-weight:600">Wichtigste Sicherheitsregel der ganzen Reise — bitte lesen, bevor wir ins Hochland fahren.</p>
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:.7rem;font-size:.9rem;line-height:1.5">
+      <li>🌊 Island hat <strong>unbefestigte Flüsse ohne Brücke</strong> — manche F-Strassen erfordern direktes Durchfahren</li>
+      <li>🌅 <strong>Immer früh am Tag überqueren</strong> — Gletscherschmelze lässt Pegel tagsüber stark ansteigen, morgens ist das Wasser am niedrigsten</li>
+      <li>👣 <strong>Vor der Überquerung aussteigen</strong> und zu Fuss prüfen: Tiefe, Strömung, Untergrund</li>
+      <li>🐢 <strong>Langsam und konstant</strong> durchfahren — nie stoppen mitten im Fluss, nie zu schnell <span style="color:var(--muted)">(Bugwelle überflutet Motor)</span></li>
+      <li>🪟 <strong>Fenster leicht öffnen</strong> vor der Überquerung — Druckausgleich falls Auto kippt</li>
+      <li>🚙 <strong>Beide Autos überqueren nie gleichzeitig</strong> — erstes Auto überquert, wartet auf der anderen Seite, dann zweites</li>
+      <li>↩️ <strong>Bei Zweifel: umkehren.</strong> Kein Foto ist das Risiko wert.</li>
+    </ul>
+  </div>
+
+  <!-- 💨 Wetter & Sicherheit -->
+  <div class="section-label" style="margin-top:1.5rem">💨 Wetter & Sicherheit</div>
+  <div class="card">
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:.65rem;font-size:.9rem;line-height:1.5">
+      <li>📲 <strong>Road.is App</strong> — immer checken vor langen Fahrten <span style="color:var(--muted)">(Strassensperrungen, Wetter, Farbe: grün/gelb/orange/rot)</span></li>
+      <li>💨 <strong>Starker Wind unterschätzen</strong>: Türe beim Aussteigen <em>immer mit beiden Händen halten</em> — kann buchstäblich aus der Hand gerissen werden</li>
+      <li>🛑 <strong>Bei Sturm (gelb+):</strong> nicht fahren, nicht aussteigen. Warten.</li>
+      <li>🌫 <strong>Sichtweite bei Nebel</strong> kann auf 10m fallen — Warnblinker an, Tempo runter</li>
+    </ul>
+  </div>
+
+  <!-- 🚗 Convoy Rules -->
+  <div class="section-label" style="margin-top:1.5rem">🚗 2-Auto Convoy Regeln</div>
+  <div class="card" style="background:rgba(74,143,168,.06);border-color:rgba(74,143,168,.35)">
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:.65rem;font-size:.9rem;line-height:1.5">
+      <li>🔄 <strong>Lead Car rotiert täglich</strong> — setzt Tempo, wählt Stopps</li>
+      <li>⏱️ <strong>3-Minuten-Regel</strong> — Sichtkontakt verloren? Nach 3 min anhalten und warten</li>
+      <li>🚨 <strong>Stopp-Signal</strong> — 2× Warnblinker = "Ich muss stoppen, folgt mir"</li>
+      <li>📍 <strong>Lost Protocol</strong> — beide Autos stoppen, WhatsApp, Treffpunkt = letzter bekannter Wegpunkt</li>
+      <li>🚫 <strong>Kein Überholen</strong> ausser Notfall</li>
+      <li>☕ <strong>Morgen-Briefing (5 min)</strong> — Route, Tankplan, Mittagsstopp, Ankunftszeit. Beide Autos dabei.</li>
+    </ul>
+  </div>
+
+  <!-- 📱 Apps -->
+  <div class="section-label" style="margin-top:1.5rem">📱 Wichtige Apps</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem">
+    <a href="https://road.is/" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;color:inherit;margin-bottom:0">
+      <div style="font-weight:600;font-size:.92rem">road.is</div>
+      <div style="font-size:.74rem;color:var(--muted);margin-top:.25rem">Strassenzustand <span class="tag tag-red" style="margin-left:.3rem">Pflicht</span></div>
+    </a>
+    <a href="https://en.vedur.is/" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;color:inherit;margin-bottom:0">
+      <div style="font-weight:600;font-size:.92rem">vedur.is</div>
+      <div style="font-size:.74rem;color:var(--muted);margin-top:.25rem">Wetter Island <span class="tag tag-red" style="margin-left:.3rem">Pflicht</span></div>
+    </a>
+    <a href="https://maps.me/" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;color:inherit;margin-bottom:0">
+      <div style="font-weight:600;font-size:.92rem">maps.me</div>
+      <div style="font-size:.74rem;color:var(--muted);margin-top:.25rem">Offline-Karten <span class="tag tag-orange" style="margin-left:.3rem">Empf.</span></div>
+    </a>
+    <a href="https://www.safetravel.is/112-iceland-app" target="_blank" rel="noopener" class="card" style="display:block;text-decoration:none;color:inherit;margin-bottom:0">
+      <div style="font-weight:600;font-size:.92rem">112 Iceland</div>
+      <div style="font-size:.74rem;color:var(--muted);margin-top:.25rem">SOS / GPS <span class="tag tag-red" style="margin-left:.3rem">Pflicht</span></div>
+    </a>
+  </div>
+
+  <div style="text-align:center;font-size:.75rem;color:var(--muted);margin-top:1.5rem;padding:0 .5rem;line-height:1.6">
+    Diese Seite vor jeder längeren Etappe nochmal kurz durchgehen.<br>
+    Im Notfall: <strong style="color:#f08070">112</strong> (funktioniert auch ohne SIM).
+  </div>
+
+</main>
+
+<div id="nav-container"></div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="db.js"></script>
+<script>
+document.getElementById('nav-container').innerHTML = navHTML('fahren');
+</script>
+</body>
+</html>
