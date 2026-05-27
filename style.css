@@ -108,7 +108,7 @@ p  { line-height: 1.6; }
 
 @media (max-width: 600px) {
   .topbar { padding: .35rem .65rem; gap: .25rem; height: auto; min-height: 62px; align-items: center; }
-  .topbar-logo { font-size: .78rem; }
+  .topbar-logo { display: none; }
   .topbar-nav { gap: .05rem; }
   .topbar-nav .nav-item {
     flex-direction: column;
