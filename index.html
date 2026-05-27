@@ -156,7 +156,7 @@ TRIP.phases.forEach(ph => {
   if (video) {
     d.className = 'phase-band has-video';
     d.style.cssText = `border-color:${ph.color};`;
-    d.innerHTML = `<video autoplay muted loop playsinline preload="metadata"><source src="images/${video}" type="video/mp4"></video><div class="phase-band-content">${innerContent}</div>`;
+    d.innerHTML = `<video autoplay muted loop playsinline preload="metadata" poster="images/hauganes-poster.jpg" style="background:#0f1923"><source src="images/${video}" type="video/mp4"></video><div class="phase-band-content">${innerContent}</div>`;
   } else if (img) {
     d.className = 'phase-band has-image';
     d.style.cssText = `background-image:linear-gradient(rgba(15,25,35,.65),rgba(15,25,35,.85)),url('images/${img}');border-color:${ph.color};`;
