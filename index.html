@@ -37,8 +37,15 @@
     <div style="height:.8rem"></div>
   </div>
 
-  <!-- Weather -->
-  <div class="card" id="weather-card" style="display:none;padding:1.1rem 1rem;margin-top:1rem"></div>
+  <!-- Iceland fact rotator -->
+  <div class="card" id="fact-card" style="padding:1.1rem 1.2rem;margin-top:1rem;margin-bottom:1.2rem;background:linear-gradient(135deg,rgba(74,143,168,.08),rgba(58,122,148,.05));border-color:rgba(74,143,168,.25)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem">
+      <span style="font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)" id="fact-cat">🧙 Wussten Sie schon?</span>
+      <button id="fact-next" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:99px;font-size:.7rem;padding:.35rem .75rem;cursor:pointer;min-height:32px">↻ Nächste</button>
+    </div>
+    <div id="fact-text" style="font-size:.92rem;line-height:1.55;margin-bottom:.55rem">…</div>
+    <a id="fact-link" href="#" target="_blank" rel="noopener" style="font-size:.74rem;color:var(--ice);text-decoration:none">→ Mehr erfahren</a>
+  </div>
 
   <!-- Quick action -->
   <div style="margin-bottom:1.2rem">
@@ -59,15 +66,8 @@
     <div style="font-size:.7rem;color:var(--muted);text-align:right;margin-top:.4rem">© OpenStreetMap</div>
   </details>
 
-  <!-- Iceland fact rotator -->
-  <div class="card" id="fact-card" style="padding:1.1rem 1.2rem;margin-bottom:1.2rem;background:linear-gradient(135deg,rgba(74,143,168,.08),rgba(58,122,148,.05));border-color:rgba(74,143,168,.25)">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.55rem">
-      <span style="font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)" id="fact-cat">🧙 Wussten Sie schon?</span>
-      <button id="fact-next" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:99px;font-size:.7rem;padding:.35rem .75rem;cursor:pointer;min-height:32px">↻ Nächste</button>
-    </div>
-    <div id="fact-text" style="font-size:.92rem;line-height:1.55;margin-bottom:.55rem">…</div>
-    <a id="fact-link" href="#" target="_blank" rel="noopener" style="font-size:.74rem;color:var(--ice);text-decoration:none">→ Mehr erfahren</a>
-  </div>
+  <!-- Weather -->
+  <div class="card" id="weather-card" style="display:none;padding:1.1rem 1rem;margin-bottom:1.2rem"></div>
 
   <!-- Road status -->
   <div class="card" id="road-card" style="padding:1.1rem 1rem;margin-bottom:1.2rem"></div>
