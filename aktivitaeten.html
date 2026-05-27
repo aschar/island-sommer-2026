@@ -22,6 +22,7 @@
   }
   .activity-card.checked .card-check { background:var(--glacier);border-color:var(--glacier); }
   .phase-tabs { display:flex;overflow-x:auto;gap:.45rem;padding:.75rem 1rem;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);scrollbar-width:none; }
+  @media (min-width: 600px) { .phase-tabs { justify-content: center; } }
   .phase-tabs::-webkit-scrollbar{display:none}
   .phase-tab { white-space:nowrap;background:var(--card);border:1px solid var(--border);border-radius:99px;padding:.35rem .9rem;font-size:.78rem;cursor:pointer;color:var(--muted);flex-shrink:0;transition:all .18s; }
   .phase-tab.active { background:var(--glacier);border-color:var(--glacier);color:#fff;font-weight:600; }
