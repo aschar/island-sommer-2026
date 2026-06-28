@@ -163,8 +163,5 @@ function navHTML(activePage) {
     </a>
     <a class="nav-item${activePage==='fahren'?' active':''}" href="fahren.html" data-page="fahren">
       <span class="nav-icon">🚗</span><span class="nav-label">Fahren</span>
-    </a>
-    <a class="nav-item" href="https://splid.net/j/4PCL5HT9L" target="_blank" rel="noopener">
-      <span class="nav-icon">💸</span><span class="nav-label">Splid</span>
     </a>`;
 }
