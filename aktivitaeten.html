@@ -56,7 +56,7 @@ document.getElementById('nav-container').innerHTML = navHTML('aktivitaeten');
 // Confirmed bookings only, in strict date order.
 const BOOKINGS = [
   { date:'Donnerstag, 16. Juli', name:'Vulkan-Quad / ATV-Tour', time:'12:00–13:00',
-    group:false, who:'👤 Nur 5', lang:false, price:null,
+    group:false, who:'👤 Nur 5', people:'Adrian, Mauro, Lorean, Claudio, Peter', lang:false, price:'610 CHF',
     meet:'Volcano ATV, Strandvegur 65, Vestmannaeyjar' },
 
   { date:'Donnerstag, 16. Juli', name:'Papageientaucher- & Vulkan-Tour', time:'14:30–16:30',
@@ -71,12 +71,12 @@ const BOOKINGS = [
     group:true, who:'👥 Ganze Gruppe (9)', lang:false, price:'ISK 63.900',
     meet:null },
 
-  { date:'Freitag, 24. Juli', name:'Angeltour (Mauro, Claudio, Lorean)', time:'2 Std.', note:'Startzeit folgt',
-    group:false, who:'👤 Nur 3', lang:false, price:'128 CHF p. P.',
+  { date:'Freitag, 24. Juli', name:'Angeltour', time:'2 Std.', note:'Startzeit folgt',
+    group:false, who:'👤 Nur 3', people:'Mauro, Claudio, Lorean', lang:false, price:'128 CHF p. P.',
     meet:null },
 
   { date:'Mittwoch, 29. Juli', name:'Þórsmörk Super-Jeep (Midgard)', time:'09:00–16:00',
-    group:false, who:'👤 Nur 6', lang:false, price:null,
+    group:false, who:'👤 Nur 6', lang:false, price:'1455 CHF',
     meet:null },
 ];
 
@@ -101,6 +101,7 @@ BOOKINGS.forEach(b => {
       ${b.lang ? '<span class="tag tag-gray">🇬🇧 Englisch</span>' : ''}
       ${b.price ? `<span class="tag tag-gray">${b.price}</span>` : ''}
     </div>
+    ${b.people ? `<div class="booking-meet"><span>👤</span><span>${b.people}</span></div>` : ''}
     ${b.meet ? `<div class="booking-meet"><span>📍</span><span>${b.meet}</span></div>` : ''}`;
   container.appendChild(card);
 });
